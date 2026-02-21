@@ -274,7 +274,7 @@ public:
     \param queueSizeLimit An optional size of the MIDI input queue can be specified.
   */
   RtMidiIn(RtMidi::Api api = UNSPECIFIED,
-           const std::string &clientName = "sonofze",
+           const std::string &clientName = "Steam-Mastering",
            unsigned int queueSizeLimit = 100);
 
   //! If a MIDI connection is still open, it will be closed by the destructor.
