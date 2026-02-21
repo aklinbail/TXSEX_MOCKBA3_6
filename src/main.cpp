@@ -1,196 +1,209 @@
 /*******************************************************************
-DX7 CC to Sysex Translator for Akai Force/Raspberry PI
-Author: Amit Talwar https://www.amitszone.com
+TX81z CC to Sysex Translator for Akai Force/Raspberry PI forked from dxsex
+Original Author: Amit Talwar https://www.amitszone.com
 Github: https://github.com/intelliriffer
-***************************************************************** */
+Fork designer Allan Klinbail (AI assistance provided)
+*****************************************************************
 
-/********* DX SYSEX Message Format  *********************
-SYSEX MESSAGE Parameter Change
--------------------------------
-       bits    hex  description
 
-     11110000  F0   Status byte - start sysex
-     0iiiiiii  43   ID # (i=67; Yamaha)
-     0sssnnnn  10   Sub-status (s=1) & channel number (n=0; ch 1)
-     0gggggpp  **   parameter group # (g=0; voice, g=2; function)
-     0ppppppp  **   parameter # (these are listed in next section)
-                     Note that voice parameter #'s can go over 128 so
-                     the pp bits in the group byte are either 00 for
-                     par# 0-127 or 01 for par# 128-155. In the latter case
-                     you add 128 to the 0ppppppp byte to compute par#.
-     0ddddddd  **   data byte
-     11110111  F7   Status - end sysex
+SYSTEM EXCLUSIVE DATA FORMAT
+The TX81Z has three types of System Exclusive message; Parameter Change messages, Bulk Data messages and
+Dump Request messages.
 
-*** Data Structure: Single Voice Dump & Parameter #'s (single voice format, g=0) ****
--------------------------------------------------------------------------
-Parameter
- Number    Parameter                  Value Range
----------  ---------                  -----------
-0        OP6 EG rate A              0-99
-1         "  "  rate D               "
-2         "  "  rate S               "
-3         "  "  rate R               "
-4         "  " level A               "
-5         "  " level D               "
-6         "  " level S              "
-7         "  " level R               "
-8        OP6 KBD LEV SCL BRK PT      "        C3= $27
-9         "   "   "   "  LFT DEPTH   "
-10         "   "   "   "  RHT DEPTH   "
-11         "   "   "   "  LFT CURVE  0-3       0=-LIN, -EXP, +EXP, +LIN
-12         "   "   "   "  RHT CURVE   "            "    "    "    "
-13        OP6 KBD RATE SCALING       0-7
-14        OP6 AMP MOD SENSITIVITY    0-3
-15        OP6 KEY VEL SENSITIVITY    0-7
-16        OP6 OPERATOR OUTPUT LEVEL  0-99
-17        OP6 OSC MODE (fixed/ratio) 0-1        0=ratio
-18        OP6 OSC FREQ COARSE        0-31
-19        OP6 OSC FREQ FINE          0-99
-20        OP6 OSC DETUNE             0-14
+PARAMETER CHANGE MESSAGES
+These messages change the value of a parameter in TX81Z memory. There are
+8 subgroups of Parameter Changes; VCED, ACED, PCED, Remote Switch,
+Micro Tuning, Program Change, Effect data and System data.
 
-21        OP5 EG rate A              0-99
-22         "  "  rate D               "
-23         "  "  rate S               "
-24         "  "  rate R               "
-25         "  " level A               "
-26         "  " level D               "
-27         "  " level S              "
-28         "  " level R               "
-29        OP5 KBD LEV SCL BRK PT      "        C3= $27
-30         "   "   "   "  LFT DEPTH   "
-31         "   "   "   "  RHT DEPTH   "
-32         "   "   "   "  LFT CURVE  0-3       0=-LIN, -EXP, +EXP, +LIN
-33         "   "   "   "  RHT CURVE   "            "    "    "    "
-34        OP5 KBD RATE SCALING       0-7
-35        OP5 AMP MOD SENSITIVITY    0-3
-36        OP5 KEY VEL SENSITIVITY    0-7
-37        OP5 OPERATOR OUTPUT LEVEL  0-99
-38        OP5 OSC MODE (fixed/ratio) 0-1        0=ratio
-39        OP5 OSC FREQ COARSE        0-31
-40        OP5 OSC FREQ FINE          0-99
-41        OP5 OSC DETUNE             0-14
+VCED, ACED, PCED and Remote Switch parameter change messages have the
+following format.
+F0h        Exclusive
+43h        I.D. number (Yamaha)
+1nh        Basic receive channel
+0ggggghh   ggggg = Group number, hh = Subgroup number
+0ppppppp   ppppppp = Parameter number
+0ddddddd   ddddddd = Data
+F7h        End Of Exclusive
 
-42        OP4 EG rate A              0-99
-43         "  "  rate D               "
-44         "  "  rate S               "
-45         "  "  rate R               "
-46         "  " level A               "
-47         "  " level D               "
-48         "  " level S              "
-49         "  " level R               "
-50        OP4 KBD LEV SCL BRK PT      "        C3= $27
-51         "   "   "   "  LFT DEPTH   "
-52         "   "   "   "  RHT DEPTH   "
-53         "   "   "   "  LFT CURVE  0-3       0=-LIN, -EXP, +EXP, +LIN
-54         "   "   "   "  RHT CURVE   "            "    "    "    "
-55        OP4 KBD RATE SCALING       0-7
-56        OP4 AMP MOD SENSITIVITY    0-3
-57        OP4 KEY VEL SENSITIVITY    0-7
-58        OP4 OPERATOR OUTPUT LEVEL  0-99
-59        OP4 OSC MODE (fixed/ratio) 0-1        0=ratio
-60        OP4 OSC FREQ COARSE        0-31
-61        OP4 OSC FREQ FINE          0-99
-62        OP4 OSC DETUNE             0-14
+* VCED (Voice parameters compatible with DX21/27/100)
+  ggggg = 00100 (4), hh = 10 (2)
+  See p.71 for parameter numbers and data.
 
-63        OP3 EG rate A              0-99
-64         "  "  rate D               "
-65         "  "  rate S               "
-66         "  "  rate R               "
-67         "  " level A               "
-68         "  " level D               "
-69         "  " level S              "
-70         "  " level R               "
-71        OP3 KBD LEV SCL BRK PT      "        C3= $27
-72         "   "   "   "  LFT DEPTH   "
-73         "   "   "   "  RHT DEPTH   "
-74         "   "   "   "  LFT CURVE  0-3       0=-LIN, -EXP, +EXP, +LIN
-75         "   "   "   "  RHT CURVE   "            "    "    "    "
-76        OP3 KBD RATE SCALING       0-7
-77        OP3 AMP MOD SENSITIVITY    0-3
-78        OP3 KEY VEL SENSITIVITY    0-7
-79        OP3 OPERATOR OUTPUT LEVEL  0-99
-80        OP3 OSC MODE (fixed/ratio) 0-1        0=ratio
-81        OP3 OSC FREQ COARSE        0-31
-82        OP3 OSC FREQ FINE          0-99
-83        OP3 OSC DETUNE             0-14
+* ACED (Additional voice parameters for TX81Z)
+  ggggg = 00100 (4), hh = 11 (3)
+  See p.73 for parameter numbers and data.
 
-84        OP2 EG rate A              0-99
-85         "  "  rate D               "
-86         "  "  rate S               "
-87         "  "  rate R               "
-88         "  " level A               "
-89         "  " level D               "
-90         "  " level S              "
-91         "  " level R               "
-92        OP2 KBD LEV SCL BRK PT      "        C3= $27
-93         "   "   "   "  LFT DEPTH   "
-94         "   "   "   "  RHT DEPTH   "
-95         "   "   "   "  LFT CURVE  0-3       0=-LIN, -EXP, +EXP, +LIN
-96         "   "   "   "  RHT CURVE   "            "    "    "    "
-97        OP2 KBD RATE SCALING       0-7
-98        OP2 AMP MOD SENSITIVITY    0-3
-99        OP2 KEY VEL SENSITIVITY    0-7
-100        OP2 OPERATOR OUTPUT LEVEL  0-99
-101        OP2 OSC MODE (fixed/ratio) 0-1        0=ratio
-102        OP2 OSC FREQ COARSE        0-31
-103        OP2 OSC FREQ FINE          0-99
-104        OP2 OSC DETUNE             0-14
+* PCED (Performance parameters)
+  ggggg = 00100 (4), hh = 11 (3)
+  See p.74 for parameter numbers and data.
 
-105        OP1 EG rate A              0-99
-106         "  "  rate D               "
-107         "  "  rate S               "
-108         "  "  rate R               "
-109         "  " level A               "
-110         "  " level D               "
-111         "  " level S              "
-112         "  " level R               "
-113        OP1 KBD LEV SCL BRK PT      "        C3= $27
-114         "   "   "   "  LFT DEPTH   "
-115         "   "   "   "  RHT DEPTH   "
-116         "   "   "   "  LFT CURVE  0-3       0=-LIN, -EXP, +EXP, +LIN
-117         "   "   "   "  RHT CURVE   "            "    "    "    "
-118        OP1 KBD RATE SCALING       0-7
-119        OP1 AMP MOD SENSITIVITY    0-3
-120        OP1 KEY VEL SENSITIVITY    0-7
-121        OP1 OPERATOR OUTPUT LEVEL  0-99
-122        OP1 OSC MODE (fixed/ratio) 0-1        0=ratio
-123        OP1 OSC FREQ COARSE        0-31
-124        OP1 OSC FREQ FINE          0-99
-125        OP1 OSC DETUNE             0-14
+* Remote Switch (The same effect as pressing a switch on the TX81Z front
+  panel, i.e., 'remote control'.)
+  ggggg = 00100 (4), hh = 11 (3), ddddddd = 0 (off), 7F (on)
+  See p.75 for switch numbers.
 
-126        PITCH EG RATE 1            0-99
-127          "    " RATE 2              "
-128          "    " RATE 3              "
-129          "    " RATE 4              "
-130          "    " LEVEL 1             "
-131          "    " LEVEL 2             "
-132          "    " LEVEL 3             "
-133          "    " LEVEL 4             "
-134        ALGORITHM #                 0-31
-135        FEEDBACK                    0-7
-136        OSCILLATOR SYNC             0-1
-137        LFO SPEED                   0-99
-138         "  DELAY                    "
-139         "  PITCH MOD DEPTH          "
-140         "  AMP   MOD DEPTH          "
-141        LFO SYNC                    0-1
-142         "  WAVEFORM                0-5, (data sheet claims 9-4 ?!?)
-                                       0:TR, 1:SD, 2:SU, 3:SQ, 4:SI, 5:SH
-143        PITCH MOD SENSITIVITY       0-7
-144        TRANSPOSE                   0-48   12 = C2
-145        VOICE NAME CHAR 1           ASCII
-146        VOICE NAME CHAR 2           ASCII
-147        VOICE NAME CHAR 3           ASCII
-148        VOICE NAME CHAR 4           ASCII
-149        VOICE NAME CHAR 5           ASCII
-150        VOICE NAME CHAR 6           ASCII
-151        VOICE NAME CHAR 7           ASCII
-152        VOICE NAME CHAR 8           ASCII
-153        VOICE NAME CHAR 9           ASCII
-154        VOICE NAME CHAR 10          ASCII
-155        OPERATOR ON/OFF
-              bit6 = 0 / bit 5: OP1 / ... / bit 0: OP6
- */
+System Parameter Change (basic receive channel settings, etc.) and Effect
+Parameter Change (data for delay, pan and chord) messages have the following
+format.
+F0h        Exclusive
+43h        I.D. number (Yamaha)
+1nh        Basic receive channel
+0ggggghh   ggggg = 00100 (4), hh = 00 (0)
+0ppppppp   ppppppp = 1111011 (123) = System Parameter
+           ppppppp = 1111100 (124) = Effect Parameter
+0kkkkkkk   kkkkkkk = Parameter number
+
+Micro Tune parameter change messages have the following format.
+F0h        Exclusive
+43h        I.D. number (Yamaha)
+1nh        Basic receive channel
+0ggggghh   ggggg = 00100 (4), hh = 00
+0ppppppp   ppppppp = 1111101 (125) OCT
+           ppppppp = 1111110 (126) FULL
+0kkkkkkk   kkkkkkk = key number
+0hhhhhhh   hhhhhhh = note C#-1 to C7 (13-108)
+           = data fine tuning 0 to +31, -31 to -1 (0-32, 33-63)
+F7h        End Of Exclusive
+
+Program Change Table parameter change messages have the following format.
+The data is 0-184d, indicating the TX81Z memory to be selected in response to
+the incoming program change number. 0-31 (I1-I32), 32-63 (A1-A32), 64-95
+(B1-B32), 96-127 (C1-C32), 128-160 (D1-D32), 161-184 (PF1-PF24)
+
+F0h        Exclusive
+43h        I.D. number (Yamaha)
+1nh        Basic receive channel
+0ggggghh   ggggg = 00100 (4), hh = 00
+0ppppppp   ppppppp = 1111111 (127)
+0kkkkkkk   kkkkkkk = program change number
+0hhhhhhh   hhhhhhh = data (high)
+0lllllll   lllllll = data (low)
+F7h        End Of Exclusive
+*/
+/* Source: TX81Z Owner’s Manual PDF, pp.68–69 (Parameter Change Messages section). [1](https://usa.yamaha.com/files/download/other_assets/9/316769/TX81ZE.pdf)
+
+============================================================
+ TX81Z — PARAMETER TABLES (Pages 71–73)
+ Source: Yamaha TX81Z Owner’s Manual PDF
+============================================================
+
+------------------------------------------------------------
+VOICE EDIT PARAMETERS (VCED)
+------------------------------------------------------------
+Parameter number | Parameter                       | LCD          | Data
+-----------------|----------------------------------|--------------|-------------------------
+0                | Attack Rate                      | AR           | 0–31
+1                | Decay 1 Rate                     | D1R          | 0–31
+2                | Decay 2 Rate                     | D2R          | 0–31
+3                | Release Rate                     | RR           | 1–15
+4                | Decay 1 Level                    | D1L          | 0–15
+5                | Level Scaling                    | LS           | 0–99
+6                | Rate Scaling                     | RS           | 0–3
+7                | EG Bias Sensitivity              | EBS          | 0–7
+8                | Amplitude Modulation Enable      | AME          | 0–1
+9                | Key Velocity Sensitivity         | KVS          | 0–7
+10               | Operator Output Level            | OUT          | 0–99
+11               | Frequency (coarse)               | CRS          | 0–63
+12               | Detune                            | DET          | 0–6 (3=center)
+13–25            | Operator 3 parameters            | (same order) | (same ranges)
+26–38            | Operator 2 parameters            | (same order) | (same ranges)
+39–51            | Operator 1 parameters            | (same order) | (same ranges)
+52               | Algorithm                         | ALG          | 0–7
+53               | Feedback                          | Feedback     | 0–7
+54               | LFO Speed                         | Speed        | 0–99
+55               | LFO Delay                         | Delay        | 0–99
+56               | Pitch Modulation Depth            | P Mod Depth  | 0–99
+57               | Amp Modulation Depth              | A Mod Depth  | 0–99
+58               | LFO Sync                          | Sync         | 0–1
+59               | LFO Wave                          | Wave         | 0–3
+60               | Pitch Mod Sensitivity             | P Mod Sens   | 0–7
+61               | Amplitude Mod Sensitivity         | AMS          | 0–3
+62               | Transpose                         | Middle C =   | 0–48 (24=center)
+63               | Poly/Mono                         | Poly Mode    | 0–1
+64               | Pitch Bend Range                  | P Bend Range | 0–12
+65               | Portamento Mode                   | Full Time    | 0–1
+66               | Portamento Time                   | Porta Time   | 0–99
+67               | Foot Control Volume               | FC Volume    | 0–99
+68               | Sustain                            | (none)       | 0–1
+69               | Portamento                         | (none)       | 0–1
+70               | Chorus (not used)                  | (none)       | Always 0
+71               | Mod Wheel Pitch                   | MW Pitch     | 0–99
+72               | Mod Wheel Amplitude               | MW Ampl      | 0–99
+73               | Breath Control Pitch              | BC Pitch     | 0–99
+74               | Breath Control Amplitude          | BC Ampl      | 0–99
+75               | Breath Control Pitch Bias         | BC PitchBias | 0–99 (50=center)
+76               | Breath Control EG Bias            | BC EG Bias   | 0–99
+77–86            | Voice Name Characters 1–10        | ASCII        | 32–127
+93               | Operators 4–1 On/Off (bit mask)   | —            | 0–15 (1=on)
+(Parameters 87–92 are unused)
+
+------------------------------------------------------------
+ADDITIONAL VOICE EDIT PARAMETERS (ACED)
+------------------------------------------------------------
+Parameter number | Parameter                  | LCD    | Data
+-----------------|-----------------------------|--------|----------------------------
+0                | Fixed Frequency Mode        | FIX    | 0–1
+1                | Fixed Frequency Range       |        | 0–7  (0=250 Hz … 7=32 kHz)
+2                | Fine Frequency (fixed)      | FIN    | 0–15
+3                | Operator Waveform           | OSW    | 0–7
+4                | EG Shift                    | SHFT   | 0–3 (0=96dB, 1=48dB, 2=24dB, 3=12dB)
+5–9              | Operator 3 extra params     | —      | same order/type as op4
+10–14            | Operator 2 extra params     | —      | same order/type
+15–19            | Operator 1 extra params     | —      | same order/type
+20               | Reverb Rate                 | REV    | 0–7 (0=off, 7=fast)
+21               | FC Pitch                    | FC Pitch | 0–99
+22               | FC Amplitude                | FC Amplitude | 0–99
+
+------------------------------------------------------------
+PERFORMANCE EDIT PARAMETERS (PCED)
+------------------------------------------------------------
+Parameter number | Parameter               | LCD          | Data
+-----------------|--------------------------|--------------|-------------------------
+0                | Maximum Notes            | MAX NOTES    | 0–8
+1                | Voice Number MSB         | —            | (0–127 encoded)
+2                | Voice Number LSB         | 101–D32      | 0–127
+3                | Receive Channel          | RECEIVE CH   | 0–16 (16=omni)
+4                | Low Note Limit           | LIMIT/L      | 0–127 (C–2..G8)
+5                | High Note Limit          | LIMIT/H      | 0–127 (C–2..G8)
+6                | Instrument Detune        | INST DETUNE  | 0–14 (7=center)
+7                | Note Shift               | NOTE SHIFT   | 0–48 (24=center)
+8                | Volume                   | VOL          | 0–99
+9                | Output Assign            | OUT ASSIGN   | 0–3  (0=off, 1=I, 2=II, 3=I+II)
+10               | LFO Select               | LFO SELECT   | 0–3  (0=off, 1=inst1, 2=inst2, 3=vib)
+11               | Micro Tune Enable        | —            | 0–1
+12–23            | Instrument 2 parameters  | —            | Same structure
+24–35            | Instrument 3 parameters  | —            | Same
+36–47            | Instrument 4 parameters  | —            | Same
+48–59            | Instrument 5 parameters  | —            | Same
+60–71            | Instrument 6 parameters  | —            | Same
+72–83            | Instrument 7 parameters  | —            | Same
+84–95            | Instrument 8 parameters  | —            | Same
+96               | Micro Tune Table          | MICTUN       | 0–12 (0=Oct, 1=Full, 2–12=presets)
+97               | Assign Mode               | ASMODE       | 0–1 (0=norm, 1=altr)
+98               | Effect Select             | EFSEL        | 0–3 (off/Delay/Pan/Chord)
+99               | Key (for microtuning)     | KEY          | 0–11 (C–B)
+100–109          | Performance Name chars 1–10 | ASCII      | 32–127
+
+------------------------------------------------------------
+REMOTE SWITCH PARAMETERS
+------------------------------------------------------------
+Parameter number | Parameter
+-----------------|---------------------------
+64               | POWER ON (reset)
+65               | STORE
+66               | UTILITY
+67               | EDIT
+68               | PLAY
+69               | PARAMETER -1
+70               | PARAMETER +1
+71               | DATA ENTRY -1
+72               | DATA ENTRY +1
+73               | MASTER VOLUME -1
+74               | MASTER VOLUME +1
+75               | CURSOR
+
+(Data: 0 = switch off, 127 = switch on)
+*/
 
 #include "RtMidi.h"
 #include <chrono>
@@ -225,39 +238,35 @@ void sendMessage(vector<unsigned char>* message);
 void updateAlgos(int algo);
 bool isSet(int n, int k); // bit checker
 vector<unsigned char> BASE_SYX { 0xF0, 0x43, 0x10, 0, 0, 0, 0xF7 };
-const int ALGOS[32] = { // algos are bitwise, set bits are  carrirers
-    5,
-    5,
-    9,
-    9,
-    21,
-    21,
-    5,
-    5,
-    5,
-    9,
-    9,
-    5,
-    5,
-    5,
-    5,
-    1,
-    1,
-    1,
-    25,
-    11,
-    27,
-    29,
-    27,
-    31,
-    31,
-    11,
-    11,
-    37,
-    23,
-    39,
-    31,
-    63
+// TX-81Z has 8 algorithms (0-7), not 32 like DX7
+// Operator numbering for TX-81Z: OP1, OP2, OP3, OP4 (bits 1-4)
+// Set bits = carriers (audible output), Clear bits = modulators
+//
+// TX-81Z Algorithm Structure:
+// Algo 1: 4->3->2->1  (only OP1 is carrier)           = 0b0001 = 1
+// Algo 2: (4+3)->2->1 (only OP1 is carrier)           = 0b0001 = 1
+// Algo 3: 4->(3+2)->1 (only OP1 is carrier)           = 0b0001 = 1
+// Algo 4: (4->3)+(2->1) (OP1 and OP3 are carriers)    = 0b0101 = 5
+// Algo 5: (4->2)+(4->1)+(3->1) (OP1 is carrier)       = 0b0001 = 1
+// Algo 6: (4->2)+(3->2)+(2->1) (only OP1 is carrier)  = 0b0001 = 1
+// Algo 7: 4+3+2->1 (only OP1 is carrier)              = 0b0001 = 1
+// Algo 8: 4+3+2+1 (all are carriers)                  = 0b1111 = 15
+const int ALGOS[32] = {
+    // TX-81Z algorithms (0-7) - 4 operators only
+    1,    // Algorithm 0 (1): OP1 carrier
+    1,    // Algorithm 1 (2): OP1 carrier
+    1,    // Algorithm 2 (3): OP1 carrier
+    5,    // Algorithm 3 (4): OP1 and OP3 carriers
+    1,    // Algorithm 4 (5): OP1 carrier
+    1,    // Algorithm 5 (6): OP1 carrier
+    1,    // Algorithm 6 (7): OP1 carrier
+    15,   // Algorithm 7 (8): all 4 operators are carriers
+
+    // Padding for unused algorithm slots (8-31)
+    // These won't be used on TX-81Z but keep array size consistent
+    1, 1, 1, 1, 1, 1, 1, 1,
+    1, 1, 1, 1, 1, 1, 1, 1,
+    1, 1, 1, 1, 1, 1, 1, 1
 };
 enum BPOS {
     GROUP = 3,
@@ -684,6 +693,7 @@ void signalHandler(int signum)
 
 void updateAlgos(int algo)
 {
+    // Clear all envelope lists for carriers and modulators
     ATTACK.CARRIERS.clear();
     DECAY.CARRIERS.clear();
     SUSTAIN.CARRIERS.clear();
@@ -700,41 +710,49 @@ void updateAlgos(int algo)
     DECAY.LMODULATORS.clear();
     SUSTAIN.LMODULATORS.clear();
     RELEASE.LMODULATORS.clear();
+
+    // Base indices for envelope parameters - corresponds to OP4, OP3, OP2, OP1 in DX7 numbering
+    // (TX-81Z uses 4 operators but maps to the top 4 of the DX7 structure)
     struct
     {
-        int ATTACK = 20;
-        int DECAY = 26;
-        int SUSTAIN = 32;
-        int RELEASE = 38;
-        int lATTACK = 78; // levels
-        int lDECAY = 79;
-        int lSUSTAIN = 80;
-        int lRELEASE = 81;
-
+        int ATTACK = 42;   // Base CC for Attack rate (OP4 in DX7 structure = OP1 in TX-81Z)
+        int DECAY = 43;    // Base CC for Decay rate
+        int SUSTAIN = 44;  // Base CC for Sustain rate
+        int RELEASE = 45;  // Base CC for Release rate
+        int lATTACK = 46;  // Base CC for Attack level
+        int lDECAY = 47;   // Base CC for Decay level
+        int lSUSTAIN = 48; // Base CC for Sustain level
+        int lRELEASE = 49; // Base CC for Release level
     } index;
-    for (int i = 1; i <= 6; i++) {
-        if (isSet(ALGOS[algo], i)) {
-            ATTACK.CARRIERS.push_back(index.ATTACK + i - 1);
-            DECAY.CARRIERS.push_back(index.DECAY + (i - 1));
-            SUSTAIN.CARRIERS.push_back(index.SUSTAIN + (i - 1));
-            RELEASE.CARRIERS.push_back(index.RELEASE + i - 1);
 
-            ATTACK.LCARRIERS.push_back(index.lATTACK + ((i - 1) * 4));
-            DECAY.LCARRIERS.push_back(index.lDECAY + ((i - 1) * 4));
-            SUSTAIN.LCARRIERS.push_back(index.lSUSTAIN + ((i - 1) * 4));
-            RELEASE.LCARRIERS.push_back(index.lRELEASE + ((i - 1) * 4));
+    // Loop through 4 operators (TX-81Z/DX-21/DX-27)
+    for (int i = 1; i <= 4; i++) {
+        if (isSet(ALGOS[algo], i)) {
+            // This operator is a CARRIER (produces audible output)
+            ATTACK.CARRIERS.push_back(index.ATTACK + (i - 1) * 21);      // Each operator is 21 params apart
+            DECAY.CARRIERS.push_back(index.DECAY + (i - 1) * 21);
+            SUSTAIN.CARRIERS.push_back(index.SUSTAIN + (i - 1) * 21);
+            RELEASE.CARRIERS.push_back(index.RELEASE + (i - 1) * 21);
+
+            // Level envelope parameters
+            ATTACK.LCARRIERS.push_back(index.lATTACK + (i - 1) * 21);
+            DECAY.LCARRIERS.push_back(index.lDECAY + (i - 1) * 21);
+            SUSTAIN.LCARRIERS.push_back(index.lSUSTAIN + (i - 1) * 21);
+            RELEASE.LCARRIERS.push_back(index.lRELEASE + (i - 1) * 21);
         } else {
-            ATTACK.MODULATORS.push_back(index.ATTACK + i - 1);
-            DECAY.MODULATORS.push_back(index.lDECAY + ((i - 1) * 4));
-            SUSTAIN.MODULATORS.push_back(index.lSUSTAIN + ((i - 1) * 4));
-            RELEASE.MODULATORS.push_back(index.RELEASE + i - 1);
-            ATTACK.LMODULATORS.push_back(index.lATTACK + ((i - 1) * 4));
-            DECAY.LMODULATORS.push_back(index.lDECAY + ((i - 1) * 4));
-            SUSTAIN.LMODULATORS.push_back(index.lSUSTAIN + ((i - 1) * 4));
-            RELEASE.LMODULATORS.push_back(index.lRELEASE + ((i - 1) * 4));
+            // This operator is a MODULATOR (modulates other operators)
+            ATTACK.MODULATORS.push_back(index.ATTACK + (i - 1) * 21);
+            DECAY.MODULATORS.push_back(index.DECAY + (i - 1) * 21);
+            SUSTAIN.MODULATORS.push_back(index.SUSTAIN + (i - 1) * 21);
+            RELEASE.MODULATORS.push_back(index.RELEASE + (i - 1) * 21);
+
+            ATTACK.LMODULATORS.push_back(index.lATTACK + (i - 1) * 21);
+            DECAY.LMODULATORS.push_back(index.lDECAY + (i - 1) * 21);
+            SUSTAIN.LMODULATORS.push_back(index.lSUSTAIN + (i - 1) * 21);
+            RELEASE.LMODULATORS.push_back(index.lRELEASE + (i - 1) * 21);
         }
     }
-    // std::cout << "dxSex Algos Updated" << endl;
+    // std::cout << "TX-81Z 4-Op Algos Updated" << endl;
 }
 
 bool isSet(int n, int k)
