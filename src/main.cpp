@@ -204,7 +204,7 @@ Parameter number | Parameter
 
 (Data: 0 = switch off, 127 = switch on)
 */
-
+#include <map>
 #include "RtMidi.h"
 #include <chrono>
 #include <csignal>
@@ -217,7 +217,7 @@ using std::chrono::duration_cast;
 using std::chrono::seconds;
 using std::chrono::system_clock;
 
-const string PORT_PREFIX = "DX";
+const string PORT_PREFIX = "TX";
 void onMIDI(double deltatime, std::vector<unsigned char>* message, void* /*userData*/);
 int limit(int val, int min, int max);
 unsigned char validCC[14] = { 1, 2, 7, 10, 64, 66, 120, 121, 122, 123, 124, 125, 126, 127 };
@@ -238,10 +238,7 @@ void sendMessage(vector<unsigned char>* message);
 void updateAlgos(int algo);
 bool isSet(int n, int k); // bit checker
 vector<unsigned char> BASE_SYX { 0xF0, 0x43, 0x10, 0, 0, 0, 0xF7 };
-// TX-81Z has 8 algorithms (0-7), not 32 like DX7
-// Operator numbering for TX-81Z: OP1, OP2, OP3, OP4 (bits 1-4)
-// Set bits = carriers (audible output), Clear bits = modulators
-//
+
 // TX-81Z Algorithm Structure:
 // Algo 1: 4->3->2->1  (only OP1 is carrier)           = 0b0001 = 1
 // Algo 2: (4+3)->2->1 (only OP1 is carrier)           = 0b0001 = 1
@@ -251,8 +248,7 @@ vector<unsigned char> BASE_SYX { 0xF0, 0x43, 0x10, 0, 0, 0, 0xF7 };
 // Algo 6: (4->2)+(3->2)+(2->1) (only OP1 is carrier)  = 0b0001 = 1
 // Algo 7: 4+3+2->1 (only OP1 is carrier)              = 0b0001 = 1
 // Algo 8: 4+3+2+1 (all are carriers)                  = 0b1111 = 15
-const int ALGOS[32] = {
-    // TX-81Z algorithms (0-7) - 4 operators only
+const int ALGOS[8] = {
     1,    // Algorithm 0 (1): OP1 carrier
     1,    // Algorithm 1 (2): OP1 carrier
     1,    // Algorithm 2 (3): OP1 carrier
@@ -260,13 +256,7 @@ const int ALGOS[32] = {
     1,    // Algorithm 4 (5): OP1 carrier
     1,    // Algorithm 5 (6): OP1 carrier
     1,    // Algorithm 6 (7): OP1 carrier
-    15,   // Algorithm 7 (8): all 4 operators are carriers
-
-    // Padding for unused algorithm slots (8-31)
-    // These won't be used on TX-81Z but keep array size consistent
-    1, 1, 1, 1, 1, 1, 1, 1,
-    1, 1, 1, 1, 1, 1, 1, 1,
-    1, 1, 1, 1, 1, 1, 1, 1
+    15    // Algorithm 7 (8): all 4 operators are carriers
 };
 enum BPOS {
     GROUP = 3,
@@ -310,137 +300,152 @@ struct ENVS {
 ENVS ATTACK, DECAY, SUSTAIN, RELEASE;
 
 CC_MAPPING MAP[128] = {
-    {SYSEX, 0, 0, 1, 12, 63},    //0  Poly Mono mode
-    {SYSEX, 1, 0, 48, 12, 62},   // 1 Transpose
-    {CC, 2, 0, 127, 0, 0},       // breath
-    {SYSEX, 3, 0, 99, 12, 54},   // 3 LFO SPEED
-    {CC, 4, 0, 127, 0, 0},       // Foot
-    {CC, 5, 0, 127, 0, 0},       // Portamento
-    {SYSEX, 6, 0, 99, 12, 55},   // LFO DELAY
-    {CC, 7, 0, 127, 0, 0},       // 7 Volume
-    {SYSEX, 8, 0, 99, 12, 56},   // 8 LFO PMD
-    {SYSEX, 9, 0, 99, 12, 57},   // 9 LFO AMD
-    {CC, 10, 0, 127, 0, 0},      // 10 PAN
-    {SYSEX, 11, 0, 12, 12, 64},   // 11  Pitch Bend Range
+    // Global/Voice Parameters (CC 0-27) - keeping your original mappings
+    {SYSEX, 0, 0, 1, 12, 63},     // 0  Poly Mono mode
+    {SYSEX, 1, 0, 48, 12, 62},    // 1  Transpose
+    {CC, 2, 0, 127, 0, 0},        // 2  Breath
+    {SYSEX, 3, 0, 99, 12, 54},    // 3  LFO SPEED
+    {CC, 4, 0, 127, 0, 0},        // 4  Foot
+    {CC, 5, 0, 127, 0, 0},        // 5  Portamento
+    {SYSEX, 6, 0, 99, 12, 55},    // 6  LFO DELAY
+    {CC, 7, 0, 127, 0, 0},        // 7  Volume
+    {SYSEX, 8, 0, 99, 12, 56},    // 8  LFO PMD
+    {SYSEX, 9, 0, 99, 12, 57},    // 9  LFO AMD
+    {CC, 10, 0, 127, 0, 0},       // 10 PAN
+    {SYSEX, 11, 0, 12, 12, 64},   // 11 Pitch Bend Range
     {SYSEX, 12, 0, 3, 12, 59},    // 12 LFO WAVE
-    {SYSEX, 13, 0, 1, 12, 58},   // 13 LFO Sync
-    {SYSEX, 14, 0, 7, 12, 60},   // 14 LFO PMS
+    {SYSEX, 13, 0, 1, 12, 58},    // 13 LFO Sync
+    {SYSEX, 14, 0, 7, 12, 60},    // 14 LFO PMS
     {SYSEX, 15, 0, 3, 12, 61},    // 15 LFO AMS
     {SYSEX, 16, 0, 1, 12, 65},    // 16 Portamento Mode
     {SYSEX, 17, 0, 99, 12, 66},   // 17 Portamento Time
-    {SYSEX, 18, 0, 99, 12, 67},    // 18 FC Volume
+    {SYSEX, 18, 0, 99, 12, 67},   // 18 FC Volume
     {SYSEX, 19, 0, 1, 12, 68},    // 19 Sustain
-    {SYSEX, 20, 0, 99, 12, 69},  // 20 Portamento
-    {SYSEX, 21, 0, 99, 0, 84},   // 21 Mod Wheel  Pitch
-    {SYSEX, 22, 0, 99, 0, 63},   // 22 Mod Wheel Amplitude
-    {SYSEX, 23, 0, 99, 0, 42},   // 23 a Rate op4
-    {SYSEX, 24, 0, 99, 0, 21},   // 24
-    {SYSEX, 25, 0, 99, 0, 0},    // 25 op6
-    {SYSEX, 26, 0, 99, 0, 106},  // 26 Decay op1
-    {SYSEX, 27, 0, 99, 0, 85},   // 27
-    {SYSEX, 28, 0, 99, 0, 64},   // 28
-    {SYSEX, 29, 0, 99, 0, 43},   // 29
-    {SYSEX, 30, 0, 99, 0, 22},   // 30
-    {SYSEX, 31, 0, 99, 0, 1},    // 1
-    {SYSEX, 32, 0, 99, 0, 107},  // Sus op1
-    {SYSEX, 33, 0, 99, 0, 86},   // 1
-    {SYSEX, 34, 0, 99, 0, 65},   // 1
-    {SYSEX, 35, 0, 99, 0, 44},   // 1
-    {SYSEX, 36, 0, 99, 0, 23},   // 1
-    {SYSEX, 37, 0, 99, 0, 2},    // 1
-    {SYSEX, 38, 0, 99, 0, 108},  // 1 REl op1
-    {SYSEX, 39, 0, 99, 0, 87},   // 1
-    {SYSEX, 40, 0, 99, 0, 66},   // 1
-    {SYSEX, 41, 0, 99, 0, 45},   // 1
-    {SYSEX, 42, 0, 99, 0, 24},   // 1
-    {SYSEX, 43, 0, 99, 0, 3},    //
-    {SYSEX, 44, 0, 31, 0, 123},  // 1 Coarse op1
-    {SYSEX, 45, 0, 31, 0, 102},  // 1
-    {SYSEX, 46, 0, 31, 0, 81},   // 1
-    {SYSEX, 47, 0, 31, 0, 60},   // 1
-    {SYSEX, 48, 0, 31, 0, 39},   // 1
-    {SYSEX, 49, 0, 31, 0, 18},   // 1
-    {SYSEX, 50, 0, 99, 0, 124},  // 1 Fine Op1
-    {SYSEX, 51, 0, 99, 0, 103},  // 1
-    {SYSEX, 52, 0, 99, 0, 82},   // 1
-    {SYSEX, 53, 0, 99, 0, 61},   // 1
-    {SYSEX, 54, 0, 99, 0, 40},   // 1
-    {SYSEX, 55, 0, 99, 0, 19},   // 1
-    {SKIP, 56, 0, 127, 0, 0},    // 1
-    {SKIP, 57, 0, 127, 0, 0},    // 1
-    {SKIP, 58, 0, 127, 0, 0},    // 1
-    {SKIP, 59, 0, 127, 0, 0},    // 1
-    {SKIP, 60, 0, 127, 0, 0},    // 1
-    {SKIP, 61, 0, 127, 0, 0},    // 1
-    {SKIP, 62, 0, 127, 0, 0},    // 1
-    {SKIP, 63, 0, 127, 0, 0},    // 1
-    {CC, 64, 0, 127, 0, 0},      // Sustain
-    {SKIP, 65, 0, 127, 0, 0},    // 1
-    {CC, 66, 0, 127, 0, 0},      // Sostenuto
-    {SKIP, 67, 0, 127, 0, 0},    // 1
-    {SKIP, 68, 0, 127, 0, 0},    // 1
-    {SKIP, 69, 0, 127, 0, 0},    // 1
-    {SKIP, 70, 0, 127, 0, 0},    // 1
-    {CC, 71, 0, 127, 0, 0},      // 1 Resonane For Dexed -
-    {SKIP, 72, 0, 127, 0, 0},    // 1
-    {SYSEX, 73, 0, 48, 1, 16},   // Transpose
-    {CC, 74, 0, 127, 0, 0},      // Curoff for Dexed Midi Learn - not required
-    {SYSEX, 75, 0, 7, 1, 7},     // Feedback
-    {SYSEX, 76, 0, 31, 1, 6},    // Algorithm
-    {SKIP, 77, 0, 127, 0, 0},    // 1
-    {SYSEX, 78, 0, 99, 0, 109},  // Atk level 1
-    {SYSEX, 79, 0, 99, 0, 110},  //  dc 1 lvl 1
-    {SYSEX, 80, 0, 99, 0, 111},  // sus lvl 1
-    {SYSEX, 81, 0, 99, 0, 112},  // rel lvl 1
-    {SYSEX, 82, 0, 99, 0, 88},   // a lvl 2
-    {SYSEX, 83, 0, 99, 0, 89},   // 1
-    {SYSEX, 84, 0, 99, 0, 90},   // 1
-    {SYSEX, 85, 0, 99, 0, 91},   // 1
-    {SYSEX, 86, 0, 99, 0, 67},   // op3
-    {SYSEX, 87, 0, 99, 0, 68},   // 1
-    {SYSEX, 88, 0, 99, 0, 69},   // 1
-    {SYSEX, 89, 0, 99, 0, 70},   // 1
-    {SYSEX, 90, 0, 99, 0, 46},   // op 4
-    {SYSEX, 91, 0, 99, 0, 47},   // 1
-    {SYSEX, 92, 0, 99, 0, 48},   // 1
-    {SYSEX, 93, 0, 99, 0, 49},   // 1
-    {SYSEX, 94, 0, 99, 0, 25},   // op5
-    {SYSEX, 95, 0, 99, 0, 26},   // 1
-    {SYSEX, 96, 0, 99, 0, 27},   // 1
-    {SYSEX, 97, 0, 99, 0, 28},   // 1
-    {SYSEX, 98, 0, 99, 0, 4},    // op6
-    {SYSEX, 99, 0, 99, 0, 5},    // 1
-    {SYSEX, 100, 0, 99, 0, 6},   // 1
-    {SYSEX, 101, 0, 99, 0, 7},   // 1
-    {SYSEX, 102, 0, 99, 0, 121}, // op level 1
-    {SYSEX, 103, 0, 99, 0, 100}, // 1
-    {SYSEX, 104, 0, 99, 0, 79},  // 1
-    {SYSEX, 105, 0, 99, 0, 58},  // 1
-    {SYSEX, 106, 0, 99, 0, 37},  // 1
-    {SYSEX, 107, 0, 99, 0, 16},  // 1
-    {SKIP, 108, 0, 127, 0, 0},   // 1
-    {SKIP, 109, 0, 127, 0, 0},   // 1
-    {SKIP, 110, 0, 127, 0, 0},   // 1
-    {SKIP, 111, 0, 127, 0, 0},   // 1
-    {SKIP, 112, 0, 127, 0, 0},   // 1
-    {SKIP, 113, 0, 127, 0, 0},   // 1
-    {SKIP, 114, 0, 127, 0, 0},   // 1
-    {SKIP, 115, 0, 127, 0, 0},   // 1
-    {SKIP, 116, 0, 127, 0, 0},   // 1
-    {SKIP, 117, 0, 127, 0, 0},   // 1
-    {SKIP, 118, 0, 127, 0, 0},   // 1
-    {SKIP, 119, 0, 127, 0, 0},   // 1
-    {SYSTEM, 120, 0, 127, 0, 0}, // 1
-    {SYSTEM, 121, 0, 127, 0, 0}, // 1
-    {SYSTEM, 122, 0, 127, 0, 0}, // 1
-    {SYSTEM, 123, 0, 127, 0, 0}, // 1
-    {SYSTEM, 124, 0, 127, 0, 0}, // 1
-    {SYSTEM, 125, 0, 127, 0, 0}, // 1
-    {SYSTEM, 126, 0, 127, 0, 0}, // 1
-    {SYSTEM, 127, 0, 127, 0, 0}, // 1
+    {SYSEX, 20, 0, 99, 12, 69},   // 20 Portamento
+    {SYSEX, 21, 0, 99, 12, 71},   // 21 Mod Wheel Pitch
+    {SYSEX, 22, 0, 99, 12, 72},   // 22 Mod Wheel Amplitude
+    {SYSEX, 23, 0, 7, 13, 20},    // 23 Reverb Rate - ACED param
+    {SYSEX, 24, 0, 99, 13, 21},   // 24 FC Pitch - ACED param
+    {SYSEX, 25, 0, 99, 13, 22},   // 25 FC Amplitude - ACED param
+    {SYSEX, 26, 0, 7, 12, 52},    // 26 Algorithm
+    {SYSEX, 27, 0, 7, 12, 53},    // 27 Feedback
 
+    // Reserved for future global parameters (CC 28-59)
+    {SKIP, 28, 0, 127, 0, 0},
+    {SKIP, 29, 0, 127, 0, 0},
+    {SKIP, 30, 0, 127, 0, 0},
+    {SKIP, 31, 0, 127, 0, 0},
+    {SKIP, 32, 0, 127, 0, 0},
+    {SKIP, 33, 0, 127, 0, 0},
+    {SKIP, 34, 0, 127, 0, 0},
+    {SKIP, 35, 0, 127, 0, 0},
+    {SKIP, 36, 0, 127, 0, 0},
+    {SKIP, 37, 0, 127, 0, 0},
+    {SKIP, 38, 0, 127, 0, 0},
+    {SKIP, 39, 0, 127, 0, 0},
+    {SKIP, 40, 0, 127, 0, 0},
+    {SKIP, 41, 0, 127, 0, 0},
+    {SKIP, 42, 0, 127, 0, 0},
+    {SKIP, 43, 0, 127, 0, 0},
+    {SKIP, 44, 0, 127, 0, 0},
+    {SKIP, 45, 0, 127, 0, 0},
+    {SKIP, 46, 0, 127, 0, 0},
+    {SKIP, 47, 0, 127, 0, 0},
+    {SKIP, 48, 0, 127, 0, 0},
+    {SKIP, 49, 0, 127, 0, 0},
+    {SKIP, 50, 0, 127, 0, 0},
+    {SKIP, 51, 0, 127, 0, 0},
+    {SKIP, 52, 0, 127, 0, 0},
+    {SKIP, 53, 0, 127, 0, 0},
+    {SKIP, 54, 0, 127, 0, 0},
+    {SKIP, 55, 0, 127, 0, 0},
+    {SKIP, 56, 0, 127, 0, 0},
+    {SKIP, 57, 0, 127, 0, 0},
+    {SKIP, 58, 0, 127, 0, 0},
+    {SKIP, 59, 0, 127, 0, 0},
+
+    // Standard MIDI CC pass-through (CC 60-66)
+    {CC, 60, 0, 127, 0, 0},       // 60
+    {CC, 61, 0, 127, 0, 0},       // 61
+    {CC, 62, 0, 127, 0, 0},       // 62
+    {CC, 63, 0, 127, 0, 0},       // 63
+    {CC, 64, 0, 127, 0, 0},       // 64 Sustain pedal
+    {SKIP, 65, 0, 127, 0, 0},     // 65
+    {CC, 66, 0, 127, 0, 0},       // 66 Sostenuto
+
+    // Operator-specific parameters - OP4 (CC 67-78)
+    {SYSEX, 67, 0, 31, 12, 0},    // 67 OP4 Attack Rate (AR) - VCED
+    {SYSEX, 68, 0, 31, 12, 1},    // 68 OP4 Decay 1 Rate (D1R) - VCED
+    {SYSEX, 69, 0, 31, 12, 2},    // 69 OP4 Decay 2 Rate (D2R) - VCED
+    {SYSEX, 70, 0, 15, 12, 3},    // 70 OP4 Release Rate (RR) - VCED
+    {SYSEX, 71, 0, 15, 12, 4},    // 71 OP4 Decay 1 Level (D1L) - VCED
+    {SYSEX, 72, 0, 99, 12, 10},   // 72 OP4 Output Level (OUT) - VCED
+    {SYSEX, 73, 0, 63, 12, 11},   // 73 OP4 Frequency Coarse (CRS) - VCED
+    {SYSEX, 74, 0, 6, 12, 12},    // 74 OP4 Detune (DET) - VCED
+    {SYSEX, 75, 0, 99, 12, 5},    // 75 OP4 Level Scaling (LS) - VCED
+    {SYSEX, 76, 0, 7, 12, 9},     // 76 OP4 Key Velocity Sens (KVS) - VCED
+    {SYSEX, 77, 0, 7, 13, 3},     // 77 OP4 Waveform (OSW) - ACED
+    {SYSEX, 78, 0, 1, 13, 0},     // 78 OP4 Fixed Frequency Mode - ACED
+
+    // Operator-specific parameters - OP3 (CC 79-90)
+    {SYSEX, 79, 0, 31, 12, 13},   // 79 OP3 Attack Rate (AR) - VCED
+    {SYSEX, 80, 0, 31, 12, 14},   // 80 OP3 Decay 1 Rate (D1R) - VCED
+    {SYSEX, 81, 0, 31, 12, 15},   // 81 OP3 Decay 2 Rate (D2R) - VCED
+    {SYSEX, 82, 0, 15, 12, 16},   // 82 OP3 Release Rate (RR) - VCED
+    {SYSEX, 83, 0, 15, 12, 17},   // 83 OP3 Decay 1 Level (D1L) - VCED
+    {SYSEX, 84, 0, 99, 12, 23},   // 84 OP3 Output Level (OUT) - VCED
+    {SYSEX, 85, 0, 63, 12, 24},   // 85 OP3 Frequency Coarse (CRS) - VCED
+    {SYSEX, 86, 0, 6, 12, 25},    // 86 OP3 Detune (DET) - VCED
+    {SYSEX, 87, 0, 99, 12, 18},   // 87 OP3 Level Scaling (LS) - VCED
+    {SYSEX, 88, 0, 7, 12, 22},    // 88 OP3 Key Velocity Sens (KVS) - VCED
+    {SYSEX, 89, 0, 7, 13, 8},     // 89 OP3 Waveform (OSW) - ACED
+    {SYSEX, 90, 0, 1, 13, 5},     // 90 OP3 Fixed Frequency Mode - ACED
+
+    // Operator-specific parameters - OP2 (CC 91-102)
+    {SYSEX, 91, 0, 31, 12, 26},   // 91 OP2 Attack Rate (AR) - VCED
+    {SYSEX, 92, 0, 31, 12, 27},   // 92 OP2 Decay 1 Rate (D1R) - VCED
+    {SYSEX, 93, 0, 31, 12, 28},   // 93 OP2 Decay 2 Rate (D2R) - VCED
+    {SYSEX, 94, 0, 15, 12, 29},   // 94 OP2 Release Rate (RR) - VCED
+    {SYSEX, 95, 0, 15, 12, 30},   // 95 OP2 Decay 1 Level (D1L) - VCED
+    {SYSEX, 96, 0, 99, 12, 36},   // 96 OP2 Output Level (OUT) - VCED
+    {SYSEX, 97, 0, 63, 12, 37},   // 97 OP2 Frequency Coarse (CRS) - VCED
+    {SYSEX, 98, 0, 6, 12, 38},    // 98 OP2 Detune (DET) - VCED
+    {SYSEX, 99, 0, 99, 12, 31},   // 99 OP2 Level Scaling (LS) - VCED
+    {SYSEX, 100, 0, 7, 12, 35},   // 100 OP2 Key Velocity Sens (KVS) - VCED
+    {SYSEX, 101, 0, 7, 13, 13},   // 101 OP2 Waveform (OSW) - ACED
+    {SYSEX, 102, 0, 1, 13, 10},   // 102 OP2 Fixed Frequency Mode - ACED
+
+    // Operator-specific parameters - OP1 (CC 103-114)
+    {SYSEX, 103, 0, 31, 12, 39},  // 103 OP1 Attack Rate (AR) - VCED
+    {SYSEX, 104, 0, 31, 12, 40},  // 104 OP1 Decay 1 Rate (D1R) - VCED
+    {SYSEX, 105, 0, 31, 12, 41},  // 105 OP1 Decay 2 Rate (D2R) - VCED
+    {SYSEX, 106, 0, 15, 12, 42},  // 106 OP1 Release Rate (RR) - VCED
+    {SYSEX, 107, 0, 15, 12, 43},  // 107 OP1 Decay 1 Level (D1L) - VCED
+    {SYSEX, 108, 0, 99, 12, 49},  // 108 OP1 Output Level (OUT) - VCED
+    {SYSEX, 109, 0, 63, 12, 50},  // 109 OP1 Frequency Coarse (CRS) - VCED
+    {SYSEX, 110, 0, 6, 12, 51},   // 110 OP1 Detune (DET) - VCED
+    {SYSEX, 111, 0, 99, 12, 44},  // 111 OP1 Level Scaling (LS) - VCED
+    {SYSEX, 112, 0, 7, 12, 48},   // 112 OP1 Key Velocity Sens (KVS) - VCED
+    {SYSEX, 113, 0, 7, 13, 18},   // 113 OP1 Waveform (OSW) - ACED
+    {SYSEX, 114, 0, 1, 13, 15},   // 114 OP1 Fixed Frequency Mode - ACED
+
+    // Reserved/Special purpose (CC 115-119)
+    {SKIP, 115, 0, 127, 0, 0},    // 115
+    {SKIP, 116, 0, 127, 0, 0},    // 116
+    {SKIP, 117, 0, 127, 0, 0},    // 117
+    {SKIP, 118, 0, 127, 0, 0},    // 118
+    {SKIP, 119, 0, 127, 0, 0},    // 119
+
+    // System messages (CC 120-127)
+    {SYSTEM, 120, 0, 127, 0, 0},  // 120 All Sound Off
+    {SYSTEM, 121, 0, 127, 0, 0},  // 121 Reset All Controllers
+    {SYSTEM, 122, 0, 127, 0, 0},  // 122 Local Control
+    {SYSTEM, 123, 0, 127, 0, 0},  // 123 All Notes Off
+    {SYSTEM, 124, 0, 127, 0, 0},  // 124 Omni Mode Off
+    {SYSTEM, 125, 0, 127, 0, 0},  // 125 Omni Mode On
+    {SYSTEM, 126, 0, 127, 0, 0},  // 126 Mono Mode On
+    {SYSTEM, 127, 0, 127, 0, 0},  // 127 Poly Mode On
 };
-
 RtMidiIn* midiIn = 0;
 RtMidiOut* SYX = 0;
 RtMidiOut* HWOUT = 0;
@@ -711,48 +716,52 @@ void updateAlgos(int algo)
     SUSTAIN.LMODULATORS.clear();
     RELEASE.LMODULATORS.clear();
 
-    // Base indices for envelope parameters - corresponds to OP4, OP3, OP2, OP1 in DX7 numbering
-    // (TX-81Z uses 4 operators but maps to the top 4 of the DX7 structure)
+    // Base CC numbers for TX-81Z operator parameters (reorganized layout)
+    // Operators mapped to: OP4=CC67, OP3=CC79, OP2=CC91, OP1=CC103
     struct
     {
-        int ATTACK = 42;   // Base CC for Attack rate (OP4 in DX7 structure = OP1 in TX-81Z)
-        int DECAY = 43;    // Base CC for Decay rate
-        int SUSTAIN = 44;  // Base CC for Sustain rate
-        int RELEASE = 45;  // Base CC for Release rate
-        int lATTACK = 46;  // Base CC for Attack level
-        int lDECAY = 47;   // Base CC for Decay level
-        int lSUSTAIN = 48; // Base CC for Sustain level
-        int lRELEASE = 49; // Base CC for Release level
+        int ATTACK = 67;    // Base CC for Attack Rate (AR)
+        int DECAY1 = 68;    // Base CC for Decay 1 Rate (D1R)
+        int DECAY2 = 69;    // Base CC for Decay 2 Rate (D2R)
+        int RELEASE = 70;   // Base CC for Release Rate (RR)
+        int D1LEVEL = 71;   // Base CC for Decay 1 Level (D1L)
+        int OUTPUT = 72;    // Base CC for Output Level
     } index;
 
-    // Loop through 4 operators (TX-81Z/DX-21/DX-27)
+    // Each operator block is 12 CCs apart (67, 79, 91, 103)
+    const int OP_SPACING = 12;
+
+    // Loop through 4 operators
+    // i=1 maps to OP4 (CC 67+), i=2 to OP3 (CC 79+), i=3 to OP2 (CC 91+), i=4 to OP1 (CC 103+)
     for (int i = 1; i <= 4; i++) {
+        int opOffset = (i - 1) * OP_SPACING;
+
         if (isSet(ALGOS[algo], i)) {
             // This operator is a CARRIER (produces audible output)
-            ATTACK.CARRIERS.push_back(index.ATTACK + (i - 1) * 21);      // Each operator is 21 params apart
-            DECAY.CARRIERS.push_back(index.DECAY + (i - 1) * 21);
-            SUSTAIN.CARRIERS.push_back(index.SUSTAIN + (i - 1) * 21);
-            RELEASE.CARRIERS.push_back(index.RELEASE + (i - 1) * 21);
+            ATTACK.CARRIERS.push_back(index.ATTACK + opOffset);
+            DECAY.CARRIERS.push_back(index.DECAY1 + opOffset);
+            SUSTAIN.CARRIERS.push_back(index.DECAY2 + opOffset);
+            RELEASE.CARRIERS.push_back(index.RELEASE + opOffset);
 
-            // Level envelope parameters
-            ATTACK.LCARRIERS.push_back(index.lATTACK + (i - 1) * 21);
-            DECAY.LCARRIERS.push_back(index.lDECAY + (i - 1) * 21);
-            SUSTAIN.LCARRIERS.push_back(index.lSUSTAIN + (i - 1) * 21);
-            RELEASE.LCARRIERS.push_back(index.lRELEASE + (i - 1) * 21);
+            // Level parameters (D1L as attack level, OUTPUT as sustain level)
+            ATTACK.LCARRIERS.push_back(index.D1LEVEL + opOffset);
+            DECAY.LCARRIERS.push_back(index.D1LEVEL + opOffset);
+            SUSTAIN.LCARRIERS.push_back(index.OUTPUT + opOffset);
+            RELEASE.LCARRIERS.push_back(index.OUTPUT + opOffset);
         } else {
             // This operator is a MODULATOR (modulates other operators)
-            ATTACK.MODULATORS.push_back(index.ATTACK + (i - 1) * 21);
-            DECAY.MODULATORS.push_back(index.DECAY + (i - 1) * 21);
-            SUSTAIN.MODULATORS.push_back(index.SUSTAIN + (i - 1) * 21);
-            RELEASE.MODULATORS.push_back(index.RELEASE + (i - 1) * 21);
+            ATTACK.MODULATORS.push_back(index.ATTACK + opOffset);
+            DECAY.MODULATORS.push_back(index.DECAY1 + opOffset);
+            SUSTAIN.MODULATORS.push_back(index.DECAY2 + opOffset);
+            RELEASE.MODULATORS.push_back(index.RELEASE + opOffset);
 
-            ATTACK.LMODULATORS.push_back(index.lATTACK + (i - 1) * 21);
-            DECAY.LMODULATORS.push_back(index.lDECAY + (i - 1) * 21);
-            SUSTAIN.LMODULATORS.push_back(index.lSUSTAIN + (i - 1) * 21);
-            RELEASE.LMODULATORS.push_back(index.lRELEASE + (i - 1) * 21);
+            ATTACK.LMODULATORS.push_back(index.D1LEVEL + opOffset);
+            DECAY.LMODULATORS.push_back(index.D1LEVEL + opOffset);
+            SUSTAIN.LMODULATORS.push_back(index.OUTPUT + opOffset);
+            RELEASE.LMODULATORS.push_back(index.OUTPUT + opOffset);
         }
     }
-    // std::cout << "TX-81Z 4-Op Algos Updated" << endl;
+    // std::cout << "TX-81Z 4-Op Algos Updated (reorganized CC layout)" << endl;
 }
 
 bool isSet(int n, int k)
