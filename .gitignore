@@ -32,3 +32,4 @@ Thumbs.db
 .clangd
 compile_commands.json
 output_dummy
+.code_workspace
