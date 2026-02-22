@@ -1,4 +1,4 @@
-gitignore
+
 # --- JetBrains / CLion Specific ---
 .idea/
 cmake-build-*/
@@ -28,3 +28,7 @@ Thumbs.db
 *.syx
 *.log
 *.bak
+
+.clangd
+compile_commands.json
+output_dummy

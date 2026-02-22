@@ -8,6 +8,8 @@ set(ZIP_NAME "txSex_Addon_v0.1.zip")
 set(FORCE_HOST "akai-force")
 set(FORCE_DEST "/media/662522/AddOns/txSex/")
 
+set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
+
 set(CMAKE_CXX_STANDARD 14)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
