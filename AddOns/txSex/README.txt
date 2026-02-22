@@ -1,4 +1,6 @@
-dxSEX - CC to Sysex Converter for DX7, VolcaFM, Dexed for Akai Force
+txSEX - CC to Sysex Converter for TX81z (and probably DX100,DX27, DX21) for Akai Force
+Forked from https://github.com/intelliriffer/DXSEX
+
 It kinda Works like an editor, automator for DX7 based synths.
 
 Author: Amit Talwar
@@ -9,8 +11,8 @@ Installation:
 Copy this dxSex folder to your MockbaMod AddOns Folder.
 
 USAGE:
-1: EDIT THE DX-MIDI-PORT.txt file and add the Name of the Midi Port  connected in use with DX/Dexed Device.
-the port name can be found running the following command: aconnect -o or better dxsex -ports
+1: EDIT THE TX-MIDI-PORT.txt file and add the Name of the Midi Port  connected in use with TX81z or 4OP Yamaha FM synth Device.
+the port name can be found running the following command: aconnect -o or better txsex -ports
 for example from ths output:
 # aconnect -o
 

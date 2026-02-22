@@ -1,3 +1,30 @@
-._*
-.DS_Store
+gitignore
+# --- JetBrains / CLion Specific ---
+.idea/
+cmake-build-*/
+*.iws
+*.out
+*.app
+
+# --- Compiled Binaries & Build Artefacts ---
 *.o
+*.obj
+*.a
+*.lib
+*.so
+*.dll
+*.exe
+bin/
+build/
+
+# --- OS Specific (Arch/EndeavourOS) ---
+.DS_Store
+Thumbs.db
+*~
+*.swp
+
+# --- Project Specific ---
+# If your toolchain generates temporary sysex dumps or logs
+*.syx
+*.log
+*.bak

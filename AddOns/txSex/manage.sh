@@ -1,8 +1,8 @@
 #!/bin/sh
 
-appname=dxsex
-appTitle=DxSex
-appDir=dxSex
+appname=txsex
+appTitle=TxSex
+appDir=txSex
 
 ################ NO NEED TO EDIT BELOW THIS LINE ###############
 

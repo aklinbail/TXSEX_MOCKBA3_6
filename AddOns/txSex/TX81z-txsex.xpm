@@ -1,0 +1,296 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<MPCVObject>
+  <Version>
+    <File_Version>2.1</File_Version>
+    <Application>MPC-V</Application>
+    <Application_Version>3.1.3.8</Application_Version>
+    <Platform>Linux</Platform>
+  </Version>
+  <Program type="MIDI">
+    <ProgramName>TX81z-txsyx</ProgramName>
+    <ProgramPads-v2.10>
+    <ProgramPads-v2.10>
+      {
+          &quot;ProgramPads-v2.10&quot;: {
+              &quot;Universal&quot;: {
+                  &quot;value0&quot;: true
+              },
+              &quot;Type&quot;: {
+                  &quot;value0&quot;: 5
+              },
+              &quot;universalPad&quot;: 16711935,
+              &quot;pads&quot;: {
+                  &quot;value0&quot;: 0,
+                  &quot;value1&quot;: 0,
+                  &quot;value2&quot;: 0,
+                  &quot;value3&quot;: 0,
+                  &quot;value4&quot;: 0,
+                  &quot;value5&quot;: 0,
+                  &quot;value6&quot;: 0,
+                  &quot;value7&quot;: 0,
+                  &quot;value8&quot;: 0,
+                  &quot;value9&quot;: 0,
+                  &quot;value10&quot;: 0,
+                  &quot;value11&quot;: 0,
+                  &quot;value12&quot;: 0,
+                  &quot;value13&quot;: 0,
+                  &quot;value14&quot;: 0,
+                  &quot;value15&quot;: 0,
+                  &quot;value16&quot;: 0,
+                  &quot;value17&quot;: 0,
+                  &quot;value18&quot;: 0,
+                  &quot;value19&quot;: 0,
+                  &quot;value20&quot;: 0,
+                  &quot;value21&quot;: 0,
+                  &quot;value22&quot;: 0,
+                  &quot;value23&quot;: 0,
+                  &quot;value24&quot;: 0,
+                  &quot;value25&quot;: 0,
+                  &quot;value26&quot;: 0,
+                  &quot;value27&quot;: 0,
+                  &quot;value28&quot;: 0,
+                  &quot;value29&quot;: 0,
+                  &quot;value30&quot;: 0,
+                  &quot;value31&quot;: 0,
+                  &quot;value32&quot;: 0,
+                  &quot;value33&quot;: 0,
+                  &quot;value34&quot;: 0,
+                  &quot;value35&quot;: 0,
+                  &quot;value36&quot;: 0,
+                  &quot;value37&quot;: 0,
+                  &quot;value38&quot;: 0,
+                  &quot;value39&quot;: 0,
+                  &quot;value40&quot;: 0,
+                  &quot;value41&quot;: 0,
+                  &quot;value42&quot;: 0,
+                  &quot;value43&quot;: 0,
+                  &quot;value44&quot;: 0,
+                  &quot;value45&quot;: 0,
+                  &quot;value46&quot;: 0,
+                  &quot;value47&quot;: 0,
+                  &quot;value48&quot;: 0,
+                  &quot;value49&quot;: 0,
+                  &quot;value50&quot;: 0,
+                  &quot;value51&quot;: 0,
+                  &quot;value52&quot;: 0,
+                  &quot;value53&quot;: 0,
+                  &quot;value54&quot;: 0,
+                  &quot;value55&quot;: 0,
+                  &quot;value56&quot;: 0,
+                  &quot;value57&quot;: 0,
+                  &quot;value58&quot;: 0,
+                  &quot;value59&quot;: 0,
+                  &quot;value60&quot;: 0,
+                  &quot;value61&quot;: 0,
+                  &quot;value62&quot;: 0,
+                  &quot;value63&quot;: 0,
+                  &quot;value64&quot;: 0,
+                  &quot;value65&quot;: 0,
+                  &quot;value66&quot;: 0,
+                  &quot;value67&quot;: 0,
+                  &quot;value68&quot;: 0,
+                  &quot;value69&quot;: 0,
+                  &quot;value70&quot;: 0,
+                  &quot;value71&quot;: 0,
+                  &quot;value72&quot;: 0,
+                  &quot;value73&quot;: 0,
+                  &quot;value74&quot;: 0,
+                  &quot;value75&quot;: 0,
+                  &quot;value76&quot;: 0,
+                  &quot;value77&quot;: 0,
+                  &quot;value78&quot;: 0,
+                  &quot;value79&quot;: 0,
+                  &quot;value80&quot;: 0,
+                  &quot;value81&quot;: 0,
+                  &quot;value82&quot;: 0,
+                  &quot;value83&quot;: 0,
+                  &quot;value84&quot;: 0,
+                  &quot;value85&quot;: 0,
+                  &quot;value86&quot;: 0,
+                  &quot;value87&quot;: 0,
+                  &quot;value88&quot;: 0,
+                  &quot;value89&quot;: 0,
+                  &quot;value90&quot;: 0,
+                  &quot;value91&quot;: 0,
+                  &quot;value92&quot;: 0,
+                  &quot;value93&quot;: 0,
+                  &quot;value94&quot;: 0,
+                  &quot;value95&quot;: 0,
+                  &quot;value96&quot;: 0,
+                  &quot;value97&quot;: 0,
+                  &quot;value98&quot;: 0,
+                  &quot;value99&quot;: 0,
+                  &quot;value100&quot;: 0,
+                  &quot;value101&quot;: 0,
+                  &quot;value102&quot;: 0,
+                  &quot;value103&quot;: 0,
+                  &quot;value104&quot;: 0,
+                  &quot;value105&quot;: 0,
+                  &quot;value106&quot;: 0,
+                  &quot;value107&quot;: 0,
+                  &quot;value108&quot;: 0,
+                  &quot;value109&quot;: 0,
+                  &quot;value110&quot;: 0,
+                  &quot;value111&quot;: 0,
+                  &quot;value112&quot;: 0,
+                  &quot;value113&quot;: 0,
+                  &quot;value114&quot;: 0,
+                  &quot;value115&quot;: 0,
+                  &quot;value116&quot;: 0,
+                  &quot;value117&quot;: 0,
+                  &quot;value118&quot;: 0,
+                  &quot;value119&quot;: 0,
+                  &quot;value120&quot;: 0,
+                  &quot;value121&quot;: 0,
+                  &quot;value122&quot;: 0,
+                  &quot;value123&quot;: 0,
+                  &quot;value124&quot;: 0,
+                  &quot;value125&quot;: 0,
+                  &quot;value126&quot;: 0,
+                  &quot;value127&quot;: 0
+              },
+              &quot;UnusedPads&quot;: {
+                  &quot;value0&quot;: 1
+              }
+          }
+      }
+    </ProgramPads-v2.10>
+    </ProgramPads-v2.10>
+    <PadNoteMap>
+      <PadNote number="1"><Note>0</Note></PadNote>
+      <PadNote number="2"><Note>1</Note></PadNote>
+      <!-- Pattern continues up to 128 -->
+      <PadNote number="128"><Note>127</Note></PadNote>
+    </PadNoteMap>
+    <ParameterNames>
+      <Parameter Index="0" Name="Poly/Mono 0-1"/>
+      <Parameter Index="1" Name="Transpose 0-48"/>
+      <Parameter Index="2" Name="Breath 0-127"/>
+      <Parameter Index="3" Name="LFO Speed 0-99"/>
+      <Parameter Index="4" Name="Foot 0-127"/>
+      <Parameter Index="5" Name="Porta 0-127"/>
+      <Parameter Index="6" Name="LFO Delay 0-99"/>
+      <Parameter Index="7" Name="Volume 0-127"/>
+      <Parameter Index="8" Name="LFO PMD 0-99"/>
+      <Parameter Index="9" Name="LFO AMD 0-99"/>
+      <Parameter Index="10" Name="Pan 0-127"/>
+      <Parameter Index="11" Name="PB Range 0-12"/>
+      <Parameter Index="12" Name="LFO Wave 0-3"/>
+      <Parameter Index="13" Name="LFO Sync 0-1"/>
+      <Parameter Index="14" Name="LFO PMS 0-7"/>
+      <Parameter Index="15" Name="LFO AMS 0-3"/>
+      <Parameter Index="16" Name="Porta Mode 0-1"/>
+      <Parameter Index="17" Name="Porta Time 0-99"/>
+      <Parameter Index="18" Name="FC Volume 0-99"/>
+      <Parameter Index="19" Name="Sustain 0-1"/>
+      <Parameter Index="20" Name="Portamento 0-99"/>
+      <Parameter Index="21" Name="MW Pitch 0-99"/>
+      <Parameter Index="22" Name="MW Amp 0-99"/>
+      <Parameter Index="23" Name="Verb Rate 0-7"/>
+      <Parameter Index="24" Name="FC Pitch 0-99"/>
+      <Parameter Index="25" Name="FC Amp 0-99"/>
+      <Parameter Index="26" Name="Algorithm 0-7"/>
+      <Parameter Index="27" Name="Feedback 0-7"/>
+      <Parameter Index="28" Name="Transpose 0-48"/>
+      <Parameter Index="29" Name="BC Pitch 0-99"/>
+      <Parameter Index="30" Name="BC Amp 0-99"/>
+      <Parameter Index="31" Name="BC P-Bias 0-99"/>
+      <Parameter Index="32" Name="BC EG-Bias 0-127"/>
+      <Parameter Index="33" Name="Char 1 0-127"/>
+      <Parameter Index="34" Name="Char 2 0-127"/>
+      <Parameter Index="35" Name="Char 3 0-127"/>
+      <Parameter Index="36" Name="Char 4 0-127"/>
+      <Parameter Index="37" Name="Char 5 0-127"/>
+      <Parameter Index="38" Name="Char 6 0-127"/>
+      <Parameter Index="39" Name="Char 7 0-127"/>
+      <Parameter Index="40" Name="Char 8 0-127"/>
+      <Parameter Index="41" Name="Char 9 0-127"/>
+      <Parameter Index="42" Name="Char 10 0-127"/>
+      <Parameter Index="43" Name="Op On/Off 0-127"/>
+      <Parameter Index="44" Name="Verb Rate 0-7"/>
+      <Parameter Index="45" Name="FC Pitch 0-99"/>
+      <Parameter Index="46" Name="FC Amp 0-99"/>
+      <Parameter Index="47" Name="Op4 FixRng 0-7"/>
+      <Parameter Index="48" Name="Op4 Fine 0-15"/>
+      <Parameter Index="49" Name="Op4 EGShft 0-3"/>
+      <Parameter Index="50" Name="Op3 FixRng 0-7"/>
+      <Parameter Index="51" Name="Op3 Fine 0-15"/>
+      <Parameter Index="52" Name="Op3 EGShft 0-3"/>
+      <Parameter Index="53" Name="Op2 FixRng 0-7"/>
+      <Parameter Index="54" Name="Op2 Fine 0-15"/>
+      <Parameter Index="55" Name="Op2 EGShft 0-3"/>
+      <Parameter Index="56" Name="Op1 FixRng 0-7"/>
+      <Parameter Index="57" Name="Op1 Fine 0-15"/>
+      <Parameter Index="58" Name="Op1 EGShft 0-3"/>
+      <Parameter Index="59" Name="-- 0-127"/>
+      <Parameter Index="60" Name="-- 0-127"/>
+      <Parameter Index="61" Name="-- 0-127"/>
+      <Parameter Index="62" Name="-- 0-127"/>
+      <Parameter Index="63" Name="-- 0-127"/>
+      <Parameter Index="64" Name="Sustain 0-127"/>
+      <Parameter Index="65" Name="-- 0-127"/>
+      <Parameter Index="66" Name="Sostenuto 0-127"/>
+      <Parameter Index="67" Name="Op4 AR 0-31"/>
+      <Parameter Index="68" Name="Op4 D1R 0-31"/>
+      <Parameter Index="69" Name="Op4 D2R 0-31"/>
+      <Parameter Index="70" Name="Op4 RR 0-15"/>
+      <Parameter Index="71" Name="Op4 D1L 0-15"/>
+      <Parameter Index="72" Name="Op4 Level 0-99"/>
+      <Parameter Index="73" Name="Op4 Crs 0-63"/>
+      <Parameter Index="74" Name="Op4 Detune 0-6"/>
+      <Parameter Index="75" Name="Op4 Scl 0-99"/>
+      <Parameter Index="76" Name="Op4 RtScl 0-3"/>
+      <Parameter Index="77" Name="Op4 Velo 0-7"/>
+      <Parameter Index="78" Name="Op4 Wave 0-7"/>
+      <Parameter Index="79" Name="Op4 FixMode 0-1"/>
+      <Parameter Index="80" Name="Op3 AR 0-31"/>
+      <Parameter Index="81" Name="Op3 D1R 0-31"/>
+      <Parameter Index="82" Name="Op3 D2R 0-31"/>
+      <Parameter Index="83" Name="Op3 RR 0-15"/>
+      <Parameter Index="84" Name="Op3 D1L 0-15"/>
+      <Parameter Index="85" Name="Op3 Level 0-99"/>
+      <Parameter Index="86" Name="Op3 Crs 0-63"/>
+      <Parameter Index="87" Name="Op3 Detune 0-6"/>
+      <Parameter Index="88" Name="Op3 Scl 0-99"/>
+      <Parameter Index="89" Name="Op3 RtScl 0-3"/>
+      <Parameter Index="90" Name="Op3 Velo 0-7"/>
+      <Parameter Index="91" Name="Op3 Wave 0-7"/>
+      <Parameter Index="92" Name="Op3 FixMode 0-1"/>
+      <Parameter Index="93" Name="Op2 AR 0-31"/>
+      <Parameter Index="94" Name="Op2 D1R 0-31"/>
+      <Parameter Index="95" Name="Op2 D2R 0-31"/>
+      <Parameter Index="96" Name="Op2 RR 0-15"/>
+      <Parameter Index="97" Name="Op2 D1L 0-15"/>
+      <Parameter Index="98" Name="Op2 Level 0-99"/>
+      <Parameter Index="99" Name="Op2 Crs 0-63"/>
+      <Parameter Index="100" Name="Op2 Detune 0-6"/>
+      <Parameter Index="101" Name="Op2 Scl 0-99"/>
+      <Parameter Index="102" Name="Op2 RtScl 0-3"/>
+      <Parameter Index="103" Name="Op2 Velo 0-7"/>
+      <Parameter Index="104" Name="Op2 Wave 0-7"/>
+      <Parameter Index="105" Name="Op2 FixMode 0-1"/>
+      <Parameter Index="106" Name="Op1 AR 0-31"/>
+      <Parameter Index="107" Name="Op1 D1R 0-31"/>
+      <Parameter Index="108" Name="Op1 D2R 0-31"/>
+      <Parameter Index="109" Name="Op1 RR 0-15"/>
+      <Parameter Index="110" Name="Op1 D1L 0-15"/>
+      <Parameter Index="111" Name="Op1 Level 0-99"/>
+      <Parameter Index="112" Name="Op1 Crs 0-63"/>
+      <Parameter Index="113" Name="Op1 Detune 0-6"/>
+      <Parameter Index="114" Name="Op1 Scl 0-99"/>
+      <Parameter Index="115" Name="Op1 RtScl 0-3"/>
+      <Parameter Index="116" Name="Op1 Velo 0-7"/>
+      <Parameter Index="117" Name="Op1 Wave 0-7"/>
+      <Parameter Index="118" Name="Op1 FixMode 0-1"/>
+      <Parameter Index="119" Name="-- 0-127"/>
+      <Parameter Index="120" Name="All Snd Off 0-127"/>
+      <Parameter Index="121" Name="Reset Ctrl 0-127"/>
+      <Parameter Index="122" Name="Local Ctrl 0-127"/>
+      <Parameter Index="123" Name="All Notes Off 0-127"/>
+      <Parameter Index="124" Name="Omni Off 0-127"/>
+      <Parameter Index="125" Name="Omni On 0-127"/>
+      <Parameter Index="126" Name="Mono On 0-127"/>
+      <Parameter Index="127" Name="Poly On 0-127"/>
+    </ParameterNames>
+  </Program>
+</MPCVObject>

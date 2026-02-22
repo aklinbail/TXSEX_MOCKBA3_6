@@ -329,51 +329,54 @@ CC_MAPPING MAP[128] = {
     {SYSEX, 25, 0, 99, 19, 22},   // 25 FC Amplitude - ACED param
     {SYSEX, 26, 0, 7, 18, 52},    // 26 Algorithm
     {SYSEX, 27, 0, 7, 18, 53},    // 27 Feedback
+    {SYSEX, 28, 0, 48, 18, 62},   // 28 Transpose
+    {SYSEX, 29, 0, 99, 18, 73},  // 29 BC Pitch
+    {SYSEX, 30, 0, 99, 18, 74},  // 30 BC Amplitude
+    {SYSEX, 31, 0, 99, 18, 75},  // 31 BC Pitch Bias
+    {SYSEX, 32, 0, 127, 18, 76}, // 32 BC EG Bias
+    {SYSEX, 33, 0, 127, 18, 77}, // 33 V Name Char 1
+    {SYSEX, 34, 0, 127, 18, 78}, // 34 V Name Char 2
+    {SYSEX, 35, 0, 127, 18, 79}, // 35 V Name Char 3
+    {SYSEX, 36, 0, 127, 18, 80}, // 36 V Name Char 4
+    {SYSEX, 37, 0, 127, 18, 81}, // 37 V Name Char 5
+    {SYSEX, 38, 0, 127, 18, 82}, // 38 V Name Char 6
+    {SYSEX, 39, 0, 127, 18, 83}, // 39 V Name Char 7
+    {SYSEX, 40, 0, 127, 18, 84}, // 40 V Name Char 8
+    {SYSEX, 41, 0, 127, 18, 85}, // 41 V Name Char 9
+    {SYSEX, 42, 0, 127, 18, 86}, // 42 V Name Char 10
+    {SYSEX, 43, 0, 127, 18, 93}, // 43 Operator on/off
+    {SYSEX, 44, 0, 7, 19, 20}, // 44 Reverb Rate
+    {SYSEX, 45, 0, 99, 19, 21}, // 45 FC Pitch
+    {SYSEX, 46, 0, 99, 19, 22}, // 46 FC Amplitude
+    // Operator  extra  parameters
+    {SYSEX, 47, 0, 7, 19, 1}, // 47 Op4 Fixed Frequency Range
+    {SYSEX, 48, 0, 15, 19, 2}, // 48 Op4 Fine Frequency
+    {SYSEX, 49, 0, 3, 19, 4}, // 49 Op4 EG shift
+    // OP3 ACED parameters (lines 355-357)
+    {SYSEX, 50, 0, 7, 19, 6},   // 50 Op3 Fixed Frequency Range
+    {SYSEX, 51, 0, 15, 19, 7},  // 51 Op3 Fine Frequency
+    {SYSEX, 52, 0, 3, 19, 9},   // 52 Op3 EG shift
 
-    // Reserved for future global parameters (CC 28-59)
-    {SKIP, 28, 0, 127, 0, 0},
-    {SKIP, 29, 0, 127, 0, 0},
-    {SKIP, 30, 0, 127, 0, 0},
-    {SKIP, 31, 0, 127, 0, 0},
-    {SKIP, 32, 0, 127, 0, 0},
-    {SKIP, 33, 0, 127, 0, 0},
-    {SKIP, 34, 0, 127, 0, 0},
-    {SKIP, 35, 0, 127, 0, 0},
-    {SKIP, 36, 0, 127, 0, 0},
-    {SKIP, 37, 0, 127, 0, 0},
-    {SKIP, 38, 0, 127, 0, 0},
-    {SKIP, 39, 0, 127, 0, 0},
-    {SKIP, 40, 0, 127, 0, 0},
-    {SKIP, 41, 0, 127, 0, 0},
-    {SKIP, 42, 0, 127, 0, 0},
-    {SKIP, 43, 0, 127, 0, 0},
-    {SKIP, 44, 0, 127, 0, 0},
-    {SKIP, 45, 0, 127, 0, 0},
-    {SKIP, 46, 0, 127, 0, 0},
-    {SKIP, 47, 0, 127, 0, 0},
-    {SKIP, 48, 0, 127, 0, 0},
-    {SKIP, 49, 0, 127, 0, 0},
-    {SKIP, 50, 0, 127, 0, 0},
-    {SKIP, 51, 0, 127, 0, 0},
-    {SKIP, 52, 0, 127, 0, 0},
-    {SKIP, 53, 0, 127, 0, 0},
-    {SKIP, 54, 0, 127, 0, 0},
-    {SKIP, 55, 0, 127, 0, 0},
-    {SKIP, 56, 0, 127, 0, 0},
-    {SKIP, 57, 0, 127, 0, 0},
-    {SKIP, 58, 0, 127, 0, 0},
+    // OP2 ACED parameters (lines 358-360)
+    {SYSEX, 53, 0, 7, 19, 11},  // 53 Op2 Fixed Frequency Range
+    {SYSEX, 54, 0, 15, 19, 12}, // 54 Op2 Fine Frequency
+    {SYSEX, 55, 0, 3, 19, 14},  // 55 Op2 EG shift
+
+    // OP1 ACED parameters (lines 361-363)
+    {SYSEX, 56, 0, 7, 19, 16},  // 56 Op1 Fixed Frequency Range
+    {SYSEX, 57, 0, 15, 19, 17}, // 57 Op1 Fine Frequency
+    {SYSEX, 58, 0, 3, 19, 19},  // 58 Op1 EG shift
     {SKIP, 59, 0, 127, 0, 0},
-
-    // Standard MIDI CC pass-through (CC 60-66)
     {CC, 60, 0, 127, 0, 0},       // 60
     {CC, 61, 0, 127, 0, 0},       // 61
     {CC, 62, 0, 127, 0, 0},       // 62
     {CC, 63, 0, 127, 0, 0},       // 63
+    // Standard MIDI CC pass-through (CC 64-66)
     {CC, 64, 0, 127, 0, 0},       // 64 Sustain pedal
     {SKIP, 65, 0, 127, 0, 0},     // 65
     {CC, 66, 0, 127, 0, 0},       // 66 Sostenuto
 
-    // Operator-specific parameters - OP4 (CC 67-78)
+    // Operator-specific parameters - OP4 (CC 67-79) - EXPANDED
     {SYSEX, 67, 0, 31, 18, 0},    // 67 OP4 Attack Rate (AR) - VCED
     {SYSEX, 68, 0, 31, 18, 1},    // 68 OP4 Decay 1 Rate (D1R) - VCED
     {SYSEX, 69, 0, 31, 18, 2},    // 69 OP4 Decay 2 Rate (D2R) - VCED
@@ -383,57 +386,57 @@ CC_MAPPING MAP[128] = {
     {SYSEX, 73, 0, 63, 18, 11},   // 73 OP4 Frequency Coarse (CRS) - VCED
     {SYSEX, 74, 0, 6, 18, 12},    // 74 OP4 Detune (DET) - VCED
     {SYSEX, 75, 0, 99, 18, 5},    // 75 OP4 Level Scaling (LS) - VCED
-    {SYSEX, 76, 0, 7, 18, 9},     // 76 OP4 Key Velocity Sens (KVS) - VCED
-    {SYSEX, 77, 0, 7, 19, 3},     // 77 OP4 Waveform (OSW) - ACED
-    {SYSEX, 78, 0, 1, 19, 0},     // 78 OP4 Fixed Frequency Mode - ACED
+    {SYSEX, 76, 0, 3, 18, 6},     // 76 OP4 Rate Scaling (RS) - VCED **NEW**
+    {SYSEX, 77, 0, 7, 18, 9},     // 77 OP4 Key Velocity Sens (KVS) - VCED
+    {SYSEX, 78, 0, 7, 19, 3},     // 78 OP4 Waveform (OSW) - ACED
+    {SYSEX, 79, 0, 1, 19, 0},     // 79 OP4 Fixed Frequency Mode - ACED
 
-    // Operator-specific parameters - OP3 (CC 79-90)
-    {SYSEX, 79, 0, 31, 18, 13},   // 79 OP3 Attack Rate (AR) - VCED
-    {SYSEX, 80, 0, 31, 18, 14},   // 80 OP3 Decay 1 Rate (D1R) - VCED
-    {SYSEX, 81, 0, 31, 18, 15},   // 81 OP3 Decay 2 Rate (D2R) - VCED
-    {SYSEX, 82, 0, 15, 18, 16},   // 82 OP3 Release Rate (RR) - VCED
-    {SYSEX, 83, 0, 15, 18, 17},   // 83 OP3 Decay 1 Level (D1L) - VCED
-    {SYSEX, 84, 0, 99, 18, 23},   // 84 OP3 Output Level (OUT) - VCED
-    {SYSEX, 85, 0, 63, 18, 24},   // 85 OP3 Frequency Coarse (CRS) - VCED
-    {SYSEX, 86, 0, 6, 18, 25},    // 86 OP3 Detune (DET) - VCED
-    {SYSEX, 87, 0, 99, 18, 18},   // 87 OP3 Level Scaling (LS) - VCED
-    {SYSEX, 88, 0, 7, 18, 22},    // 88 OP3 Key Velocity Sens (KVS) - VCED
-    {SYSEX, 89, 0, 7, 19, 8},     // 89 OP3 Waveform (OSW) - ACED
-    {SYSEX, 90, 0, 1, 19, 5},     // 90 OP3 Fixed Frequency Mode - ACED
+    // Operator-specific parameters - OP3 (CC 80-92) - EXPANDED
+    {SYSEX, 80, 0, 31, 18, 13},   // 80 OP3 Attack Rate (AR) - VCED
+    {SYSEX, 81, 0, 31, 18, 14},   // 81 OP3 Decay 1 Rate (D1R) - VCED
+    {SYSEX, 82, 0, 31, 18, 15},   // 82 OP3 Decay 2 Rate (D2R) - VCED
+    {SYSEX, 83, 0, 15, 18, 16},   // 83 OP3 Release Rate (RR) - VCED
+    {SYSEX, 84, 0, 15, 18, 17},   // 84 OP3 Decay 1 Level (D1L) - VCED
+    {SYSEX, 85, 0, 99, 18, 23},   // 85 OP3 Output Level (OUT) - VCED
+    {SYSEX, 86, 0, 63, 18, 24},   // 86 OP3 Frequency Coarse (CRS) - VCED
+    {SYSEX, 87, 0, 6, 18, 25},    // 87 OP3 Detune (DET) - VCED
+    {SYSEX, 88, 0, 99, 18, 18},   // 88 OP3 Level Scaling (LS) - VCED
+    {SYSEX, 89, 0, 3, 18, 19},    // 89 OP3 Rate Scaling (RS) - VCED **NEW**
+    {SYSEX, 90, 0, 7, 18, 22},    // 90 OP3 Key Velocity Sens (KVS) - VCED
+    {SYSEX, 91, 0, 7, 19, 8},     // 91 OP3 Waveform (OSW) - ACED
+    {SYSEX, 92, 0, 1, 19, 5},     // 92 OP3 Fixed Frequency Mode - ACED
 
-    // Operator-specific parameters - OP2 (CC 91-102)
-    {SYSEX, 91, 0, 31, 18, 26},   // 91 OP2 Attack Rate (AR) - VCED
-    {SYSEX, 92, 0, 31, 18, 27},   // 92 OP2 Decay 1 Rate (D1R) - VCED
-    {SYSEX, 93, 0, 31, 18, 28},   // 93 OP2 Decay 2 Rate (D2R) - VCED
-    {SYSEX, 94, 0, 15, 18, 29},   // 94 OP2 Release Rate (RR) - VCED
-    {SYSEX, 95, 0, 15, 18, 30},   // 95 OP2 Decay 1 Level (D1L) - VCED
-    {SYSEX, 96, 0, 99, 18, 36},   // 96 OP2 Output Level (OUT) - VCED
-    {SYSEX, 97, 0, 63, 18, 37},   // 97 OP2 Frequency Coarse (CRS) - VCED
-    {SYSEX, 98, 0, 6, 18, 38},    // 98 OP2 Detune (DET) - VCED
-    {SYSEX, 99, 0, 99, 18, 31},   // 99 OP2 Level Scaling (LS) - VCED
-    {SYSEX, 100, 0, 7, 18, 35},   // 100 OP2 Key Velocity Sens (KVS) - VCED
-    {SYSEX, 101, 0, 7, 19, 13},   // 101 OP2 Waveform (OSW) - ACED
-    {SYSEX, 102, 0, 1, 19, 10},   // 102 OP2 Fixed Frequency Mode - ACED
+    // Operator-specific parameters - OP2 (CC 93-105) - EXPANDED
+    {SYSEX, 93, 0, 31, 18, 26},   // 93 OP2 Attack Rate (AR) - VCED
+    {SYSEX, 94, 0, 31, 18, 27},   // 94 OP2 Decay 1 Rate (D1R) - VCED
+    {SYSEX, 95, 0, 31, 18, 28},   // 95 OP2 Decay 2 Rate (D2R) - VCED
+    {SYSEX, 96, 0, 15, 18, 29},   // 96 OP2 Release Rate (RR) - VCED
+    {SYSEX, 97, 0, 15, 18, 30},   // 97 OP2 Decay 1 Level (D1L) - VCED
+    {SYSEX, 98, 0, 99, 18, 36},   // 98 OP2 Output Level (OUT) - VCED
+    {SYSEX, 99, 0, 63, 18, 37},   // 99 OP2 Frequency Coarse (CRS) - VCED
+    {SYSEX, 100, 0, 6, 18, 38},   // 100 OP2 Detune (DET) - VCED
+    {SYSEX, 101, 0, 99, 18, 31},  // 101 OP2 Level Scaling (LS) - VCED
+    {SYSEX, 102, 0, 3, 18, 32},   // 102 OP2 Rate Scaling (RS) - VCED **NEW**
+    {SYSEX, 103, 0, 7, 18, 35},   // 103 OP2 Key Velocity Sens (KVS) - VCED
+    {SYSEX, 104, 0, 7, 19, 13},   // 104 OP2 Waveform (OSW) - ACED
+    {SYSEX, 105, 0, 1, 19, 10},   // 105 OP2 Fixed Frequency Mode - ACED
 
-    // Operator-specific parameters - OP1 (CC 103-114)
-    {SYSEX, 103, 0, 31, 18, 39},  // 103 OP1 Attack Rate (AR) - VCED
-    {SYSEX, 104, 0, 31, 18, 40},  // 104 OP1 Decay 1 Rate (D1R) - VCED
-    {SYSEX, 105, 0, 31, 18, 41},  // 105 OP1 Decay 2 Rate (D2R) - VCED
-    {SYSEX, 106, 0, 15, 18, 42},  // 106 OP1 Release Rate (RR) - VCED
-    {SYSEX, 107, 0, 15, 18, 43},  // 107 OP1 Decay 1 Level (D1L) - VCED
-    {SYSEX, 108, 0, 99, 18, 49},  // 108 OP1 Output Level (OUT) - VCED
-    {SYSEX, 109, 0, 63, 18, 50},  // 109 OP1 Frequency Coarse (CRS) - VCED
-    {SYSEX, 110, 0, 6, 18, 51},   // 110 OP1 Detune (DET) - VCED
-    {SYSEX, 111, 0, 99, 18, 44},  // 111 OP1 Level Scaling (LS) - VCED
-    {SYSEX, 112, 0, 7, 18, 48},   // 112 OP1 Key Velocity Sens (KVS) - VCED
-    {SYSEX, 113, 0, 7, 19, 18},   // 113 OP1 Waveform (OSW) - ACED
-    {SYSEX, 114, 0, 1, 19, 15},   // 114 OP1 Fixed Frequency Mode - ACED
+    // Operator-specific parameters - OP1 (CC 106-118) - EXPANDED
+    {SYSEX, 106, 0, 31, 18, 39},  // 106 OP1 Attack Rate (AR) - VCED
+    {SYSEX, 107, 0, 31, 18, 40},  // 107 OP1 Decay 1 Rate (D1R) - VCED
+    {SYSEX, 108, 0, 31, 18, 41},  // 108 OP1 Decay 2 Rate (D2R) - VCED
+    {SYSEX, 109, 0, 15, 18, 42},  // 109 OP1 Release Rate (RR) - VCED
+    {SYSEX, 110, 0, 15, 18, 43},  // 110 OP1 Decay 1 Level (D1L) - VCED
+    {SYSEX, 111, 0, 99, 18, 49},  // 111 OP1 Output Level (OUT) - VCED
+    {SYSEX, 112, 0, 63, 18, 50},  // 112 OP1 Frequency Coarse (CRS) - VCED
+    {SYSEX, 113, 0, 6, 18, 51},   // 113 OP1 Detune (DET) - VCED
+    {SYSEX, 114, 0, 99, 18, 44},  // 114 OP1 Level Scaling (LS) - VCED
+    {SYSEX, 115, 0, 3, 18, 45},   // 115 OP1 Rate Scaling (RS) - VCED **NEW**
+    {SYSEX, 116, 0, 7, 18, 48},   // 116 OP1 Key Velocity Sens (KVS) - VCED
+    {SYSEX, 117, 0, 7, 19, 18},   // 117 OP1 Waveform (OSW) - ACED
+    {SYSEX, 118, 0, 1, 19, 15},   // 118 OP1 Fixed Frequency Mode - ACED
 
-    // Reserved/Special purpose (CC 115-119)
-    {SKIP, 115, 0, 127, 0, 0},    // 115
-    {SKIP, 116, 0, 127, 0, 0},    // 116
-    {SKIP, 117, 0, 127, 0, 0},    // 117
-    {SKIP, 118, 0, 127, 0, 0},    // 118
+    // Reserved/Special purpose (CC 119)
     {SKIP, 119, 0, 127, 0, 0},    // 119
 
     // System messages (CC 120-127)
@@ -723,8 +726,8 @@ void updateAlgos(int algo)
     SUSTAIN.LMODULATORS.clear();
     RELEASE.LMODULATORS.clear();
 
-    // Base CC numbers for TX-81Z operator parameters (reorganized layout)
-    // Operators mapped to: OP4=CC67, OP3=CC79, OP2=CC91, OP1=CC103
+    // Base CC numbers for TX-81Z operator parameters
+    // Operators mapped to: OP4=CC67, OP3=CC80, OP2=CC93, OP1=CC106
     struct
     {
         int ATTACK = 67;    // Base CC for Attack Rate (AR)
@@ -735,11 +738,11 @@ void updateAlgos(int algo)
         int OUTPUT = 72;    // Base CC for Output Level
     } index;
 
-    // Each operator block is 12 CCs apart (67, 79, 91, 103)
-    const int OP_SPACING = 12;
+    // Each operator block is now 13 CCs apart (67, 80, 93, 106)
+    const int OP_SPACING = 13;
 
     // Loop through 4 operators
-    // i=1 maps to OP4 (CC 67+), i=2 to OP3 (CC 79+), i=3 to OP2 (CC 91+), i=4 to OP1 (CC 103+)
+    // i=1 maps to OP4 (CC 67+), i=2 to OP3 (CC 80+), i=3 to OP2 (CC 93+), i=4 to OP1 (CC 106+)
     for (int i = 1; i <= 4; i++) {
         int opOffset = (i - 1) * OP_SPACING;
 
@@ -768,7 +771,6 @@ void updateAlgos(int algo)
             RELEASE.LMODULATORS.push_back(index.OUTPUT + opOffset);
         }
     }
-    // std::cout << "TX-81Z 4-Op Algos Updated (reorganized CC layout)" << endl;
 }
 
 bool isSet(int n, int k)
