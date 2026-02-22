@@ -404,7 +404,7 @@ public:
     JACK (OS-X).
   */
   RtMidiOut(RtMidi::Api api = UNSPECIFIED,
-            const std::string &clientName = "Intelliriffer");
+            const std::string &clientName = "Steam-Mastering");
 
   //! The destructor closes any open MIDI connections.
   ~RtMidiOut(void) throw();

@@ -2,9 +2,7 @@
 TX81z CC to Sysex Translator for Akai Force/Raspberry PI forked from dxsex
 Original Author: Amit Talwar https://www.amitszone.com
 Github: https://github.com/intelliriffer
-Fork designer Allan Klinbail (AI assistance provided)
 *****************************************************************
-
 
 SYSTEM EXCLUSIVE DATA FORMAT
 The TX81Z has three types of System Exclusive message; Parameter Change
@@ -106,23 +104,23 @@ Parameter number | Parameter                       | LCD          | Data
 9                | Key Velocity Sensitivity         | KVS          | 0–7
 10               | Operator Output Level            | OUT          | 0–99
 11               | Frequency (coarse)               | CRS          | 0–63
-12               | Detune                            | DET          | 0–6
-(3=center) 13–25            | Operator 3 parameters            | (same order) |
-(same ranges) 26–38            | Operator 2 parameters            | (same order)
-| (same ranges) 39–51            | Operator 1 parameters            | (same
-order) | (same ranges) 52               | Algorithm                         |
-ALG          | 0–7 53               | Feedback                          |
-Feedback     | 0–7 54               | LFO Speed                         | Speed
-| 0–99 55               | LFO Delay                         | Delay        |
-0–99 56               | Pitch Modulation Depth            | P Mod Depth  | 0–99
+12               | Detune                            | DET          | 0–6 (3=center)
+13–25            | Operator 3 parameters            | (same order) | (same ranges)
+26–38            | Operator 2 parameters            | (same order) | (same ranges)
+39–51            | Operator 1 parameters            | (same order) | (same ranges)
+52               | Algorithm                         | ALG          | 0–7
+53               | Feedback                          | Feedback     | 0–7
+54               | LFO Speed                         | Speed        | 0–99
+55               | LFO Delay                         | Delay        | 0–99
+56               | Pitch Modulation Depth            | P Mod Depth  | 0–99
 57               | Amp Modulation Depth              | A Mod Depth  | 0–99
 58               | LFO Sync                          | Sync         | 0–1
 59               | LFO Wave                          | Wave         | 0–3
 60               | Pitch Mod Sensitivity             | P Mod Sens   | 0–7
 61               | Amplitude Mod Sensitivity         | AMS          | 0–3
-62               | Transpose                         | Middle C =   | 0–48
-(24=center) 63               | Poly/Mono                         | Poly Mode |
-0–1 64               | Pitch Bend Range                  | P Bend Range | 0–12
+62               | Transpose                         | Middle C =   | 0–48 (24=center)
+63               | Poly/Mono                         | Poly Mode    | 0–1
+64               | Pitch Bend Range                  | P Bend Range | 0–12
 65               | Portamento Mode                   | Full Time    | 0–1
 66               | Portamento Time                   | Porta Time   | 0–99
 67               | Foot Control Volume               | FC Volume    | 0–99
@@ -133,11 +131,11 @@ Feedback     | 0–7 54               | LFO Speed                         | Spee
 72               | Mod Wheel Amplitude               | MW Ampl      | 0–99
 73               | Breath Control Pitch              | BC Pitch     | 0–99
 74               | Breath Control Amplitude          | BC Ampl      | 0–99
-75               | Breath Control Pitch Bias         | BC PitchBias | 0–99
-(50=center) 76               | Breath Control EG Bias            | BC EG Bias |
-0–99 77–86            | Voice Name Characters 1–10        | ASCII        |
-32–127 93               | Operators 4–1 On/Off (bit mask)   | —            |
-0–15 (1=on) (Parameters 87–92 are unused)
+75               | Breath Control Pitch Bias         | BC PitchBias | 0–99 (50=center)
+76               | Breath Control EG Bias            | BC EG Bias   | 0–99
+77–86            | Voice Name Characters 1–10        | ASCII        | 32–127
+93               | Operators 4–1 On/Off (bit mask)   | —            | 0–15 (1=on)
+(Parameters 87–92 are unused)
 
 ------------------------------------------------------------
 ADDITIONAL VOICE EDIT PARAMETERS (ACED)
@@ -145,15 +143,16 @@ ADDITIONAL VOICE EDIT PARAMETERS (ACED)
 Parameter number | Parameter                  | LCD    | Data
 -----------------|-----------------------------|--------|----------------------------
 0                | Fixed Frequency Mode        | FIX    | 0–1
-1                | Fixed Frequency Range       |        | 0–7  (0=250 Hz … 7=32
-kHz) 2                | Fine Frequency (fixed)      | FIN    | 0–15 3 | Operator
-Waveform           | OSW    | 0–7 4                | EG Shift | SHFT   | 0–3
-(0=96dB, 1=48dB, 2=24dB, 3=12dB) 5–9              | Operator 3 extra params | —
-| same order/type as op4 10–14            | Operator 2 extra params     | — |
-same order/type 15–19            | Operator 1 extra params     | —      | same
-order/type 20               | Reverb Rate                 | REV    | 0–7 (0=off,
-7=fast) 21               | FC Pitch                    | FC Pitch | 0–99 22 | FC
-Amplitude                | FC Amplitude | 0–99
+1                | Fixed Frequency Range       |        | 0–7  (0=250 Hz … 7=32 kHz)
+2                | Fine Frequency (fixed)      | FIN    | 0–15
+3                | Operator Waveform           | OSW    | 0–7
+4                | EG Shift                    | SHFT   | 0–3 (0=96dB, 1=48dB, 2=24dB, 3=12dB)
+5–9              | Operator 3 extra params     | —      | same order/type as op4
+10–14            | Operator 2 extra params     | —      | same order/type
+15–19            | Operator 1 extra params     | —      | same order/type
+20               | Reverb Rate                 | REV    | 0–7 (0=off, 7=fast)
+21               | FC Pitch                    | FC Pitch | 0–99
+22               | FC Amplitude                | FC Amplitude | 0–99
 
 ------------------------------------------------------------
 PERFORMANCE EDIT PARAMETERS (PCED)
@@ -169,21 +168,21 @@ Parameter number | Parameter               | LCD          | Data
 6                | Instrument Detune        | INST DETUNE  | 0–14 (7=center)
 7                | Note Shift               | NOTE SHIFT   | 0–48 (24=center)
 8                | Volume                   | VOL          | 0–99
-9                | Output Assign            | OUT ASSIGN   | 0–3  (0=off, 1=I,
-2=II, 3=I+II) 10               | LFO Select               | LFO SELECT   | 0–3
-(0=off, 1=inst1, 2=inst2, 3=vib) 11               | Micro Tune Enable        | —
-| 0–1 12–23            | Instrument 2 parameters  | —            | Same
-structure 24–35            | Instrument 3 parameters  | —            | Same
+9                | Output Assign            | OUT ASSIGN   | 0–3  (0=off, 1=I, 2=II, 3=I+II)
+10               | LFO Select               | LFO SELECT   | 0–3  (0=off, 1=inst1, 2=inst2, 3=vib)
+11               | Micro Tune Enable        | —            | 0–1
+12–23            | Instrument 2 parameters  | —            | Same structure
+24–35            | Instrument 3 parameters  | —            | Same
 36–47            | Instrument 4 parameters  | —            | Same
 48–59            | Instrument 5 parameters  | —            | Same
 60–71            | Instrument 6 parameters  | —            | Same
 72–83            | Instrument 7 parameters  | —            | Same
 84–95            | Instrument 8 parameters  | —            | Same
-96               | Micro Tune Table          | MICTUN       | 0–12 (0=Oct,
-1=Full, 2–12=presets) 97               | Assign Mode               | ASMODE |
-0–1 (0=norm, 1=altr) 98               | Effect Select             | EFSEL | 0–3
-(off/Delay/Pan/Chord) 99               | Key (for microtuning)     | KEY | 0–11
-(C–B) 100–109          | Performance Name chars 1–10 | ASCII      | 32–127
+96               | Micro Tune Table          | MICTUN       | 0–12 (0=Oct, 1=Full, 2–12=presets)
+97               | Assign Mode               | ASMODE       | 0–1 (0=norm, 1=altr)
+98               | Effect Select             | EFSEL        | 0–3 (off/Delay/Pan/Chord)
+99               | Key (for microtuning)     | KEY          | 0–11 (C–B)
+100–109          | Performance Name chars 1–10 | ASCII      | 32–127
 
 ------------------------------------------------------------
 REMOTE SWITCH PARAMETERS
@@ -219,7 +218,8 @@ using std::chrono::seconds;
 using std::chrono::system_clock;
 
 const string PORT_PREFIX = "TX";
-int lastSent[128] = {-1};
+static int lastSent[256] = {-1};
+static bool noteState[128] = {false};
 void onMIDI(double deltatime, std::vector<unsigned char>* message, void* userData);
 int limit(int val, int min, int max);
 unsigned char validCC[14] = { 1, 2, 7, 10, 64, 66, 120, 121, 122, 123, 124, 125, 126, 127 };
@@ -507,36 +507,48 @@ int main(int argc, char *argv[]) {
   return 0;
 }
 
-void onMIDI(double deltatime, std::vector<unsigned char> *message, void * userData) {
-  unsigned char byte0 = (int)message->at(0);
-  unsigned char typ = byte0 & 0xF0;
-  uint size = message->size();
+static bool _isTransmitting = false;
 
-  if (size == 1 || byte0 == 0xF0 || typ != 0xB0)
-  {
+void onMIDI(double deltatime, std::vector<unsigned char> *message, void * userData) {
+  if (message->size() < 3) return;
+
+  unsigned char b0 = message->at(0);
+  unsigned char b1 = message->at(1);
+  unsigned char b2 = message->at(2);
+  unsigned char typ = b0 & 0xF0;
+
+  // --- 1. CLEAN PASSTHROUGH (Notes, Pitch Bend, etc.) ---
+  // No filters or "Echo Killers" here to ensure zero latency/interference.
+  // The User Warning handles the "All MIDI Devices" loop.
+  if (typ != 0xB0) {
     sendMessage(message);
     return;
   }
 
-  int mCC = (int)message->at(1);
+  // --- 2. CC MAPPING LOOKUP ---
+  int mCC = (int)b1;
   CC_MAPPING C = MAP[mCC];
 
-  // --- 1. Standard CC / SYSTEM Logic (Volume, Pan, etc.) ---
-  // --- 1. Standard CC / SYSTEM Logic ---
+  // --- 2A. FIXED CC / SYSTEM Logic (The 3.7 Freeze Fix) ---
   if (C.TYPE == CC || C.TYPE == SYSTEM) {
-    int rawIn = (int)message->at(2);
+    int rawIn = (int)b2;
 
-    if (rawIn == lastSent[mCC]) {
-      return;
-    }
+    // Deduplicate to prevent flooding
+    if (rawIn == lastSent[mCC]) return;
     lastSent[mCC] = rawIn;
 
-    message->at(1) = (unsigned char)C.CC;
-    sendMessage(message);
+    // STATIC BUFFER: This is the exact memory isolation your Sysex uses.
+    // It prevents the 3.7 Midpoint (64) freeze by decoupling input/output pointers.
+    static std::vector<unsigned char> oCC = { 0xB0, 0, 0 };
+    oCC[0] = b0; // Keep original channel
+    oCC[1] = (unsigned char)C.CC;
+    oCC[2] = (unsigned char)rawIn;
+
+    sendMessage(&oCC);
     return;
   }
 
-  // --- 2. SYSEX Logic (Algorithm & Operators) ---
+  // --- 2B. ORIGINAL SYSEX Logic (IDENTICAL TO YOUR STARTING CODE) ---
   if (C.TYPE == SYSEX) {
     int rawIn = (int)message->at(2);
     int tMin = C.MIN;
@@ -544,24 +556,18 @@ void onMIDI(double deltatime, std::vector<unsigned char> *message, void * userDa
     int tRange = tMax - tMin;
     int finalVal = tMin;
 
-    // 1. HIGH-RESOLUTION QUANTIZATION
     if (tRange > 0) {
       finalVal = tMin + ((rawIn * tRange) + 63) / 127;
     }
 
-    // 2. DE-DUPLICATION (The Gate Keeper)
-    // Only sends a message if the final integer value actually changes.
-    // This provides natural thinning without skipping any actual values.
     if (finalVal == lastSent[mCC]) {
       return;
     }
     lastSent[mCC] = finalVal;
 
-    // 3. HARDWARE CLAMP
     if (finalVal > tMax) finalVal = tMax;
     if (finalVal < tMin) finalVal = tMin;
 
-    // 4. STATIC BUFFER DISPATCH (Fastest for Akai CPU)
     static std::vector<unsigned char> oSYX = BASE_SYX;
     oSYX[BPOS::GROUP] = (unsigned char)C.GROUP;
     oSYX[BPOS::PARAMETER] = (unsigned char)C.PARAMETER;
@@ -571,7 +577,7 @@ void onMIDI(double deltatime, std::vector<unsigned char> *message, void * userDa
     return;
   }
 
-  // 5. MACRO LOGIC (Triggered by C.TYPE == MACRO - e.g. Parked CC 120)
+  // --- 2C. ORIGINAL MACRO Logic (IDENTICAL TO YOUR STARTING CODE) ---
   if (C.TYPE == MACRO) {
     int rawIn = (int)message->at(2);
     int finalVal = (rawIn * (C.MAX - C.MIN) + 63) / 127 + C.MIN;
