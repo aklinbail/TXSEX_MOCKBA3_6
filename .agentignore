@@ -1,0 +1,19 @@
+# Folders to completely block from AI indexing
+.git/
+.idea/
+cmake-build-*/
+.agent/history/
+.agent/sessions/
+node_modules/
+bin/
+obj/
+AddOns/dxSex
+
+# File types that slow down the LLM
+*.o
+*.obj
+*.a
+*.so
+*.bin
+*.syx
+compile_commands.json
