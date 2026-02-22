@@ -205,11 +205,11 @@ Parameter number | Parameter
 
 (Data: 0 = switch off, 127 = switch on)
 */
+#include <map>
 #include "RtMidi.h"
 #include <chrono>
 #include <csignal>
 #include <ctime>
-#include <map>
 #include <sys/time.h>
 #include <unistd.h>
 const unsigned char nouts = 16;
@@ -219,11 +219,10 @@ using std::chrono::seconds;
 using std::chrono::system_clock;
 
 const string PORT_PREFIX = "TX";
-void onMIDI(double deltatime, std::vector<unsigned char> *message,
-            void * /*userData*/);
+int lastSent[128] = {-1};
+void onMIDI(double deltatime, std::vector<unsigned char>* message, void* userData);
 int limit(int val, int min, int max);
-unsigned char validCC[14] = {1,   2,   7,   10,  64,  66,  120,
-                             121, 122, 123, 124, 125, 126, 127};
+unsigned char validCC[14] = { 1, 2, 7, 10, 64, 66, 120, 121, 122, 123, 124, 125, 126, 127 };
 void print();
 void cleanup();
 void listInports();
@@ -236,11 +235,11 @@ long long getSecs();
 int getOutPort(std::string str);
 int getInPort(std::string str);
 long long nextCheck = 0;
-void sendMessage(vector<unsigned char> *message);
+void sendMessage(vector<unsigned char>* message);
 
 void updateAlgos(int algo);
 bool isSet(int n, int k); // bit checker
-vector<unsigned char> BASE_SYX{0xF0, 0x43, 0x10, 0, 0, 0, 0xF7};
+vector<unsigned char> BASE_SYX { 0xF0, 0x43, 0x10, 0, 0, 0, 0xF7 };
 
 // TX-81Z Algorithm Structure:
 // Algo 1: 4->3->2->1  (only OP1 is carrier)           = 0b0001 = 1
@@ -314,7 +313,7 @@ CC_MAPPING MAP[128] = {
     {SYSEX, 17, 0, 99, 18, 66},   // 17 Portamento Time
     {SYSEX, 18, 0, 99, 18, 67},   // 18 FC Volume
     {SYSEX, 19, 0, 1, 18, 68},    // 19 Sustain
-    {SYSEX, 20, 0, 1, 18, 69},    // 20 Portamento
+    {SYSEX, 20, 0, 99, 18, 69},   // 20 Portamento
     {SYSEX, 21, 0, 99, 18, 71},   // 21 Mod Wheel Pitch
     {SYSEX, 22, 0, 99, 18, 72},   // 22 Mod Wheel Amplitude
     {SYSEX, 23, 0, 7, 19, 20},    // 23 Reverb Rate - ACED param
@@ -442,9 +441,9 @@ CC_MAPPING MAP[128] = {
     {SYSTEM, 126, 0, 127, 0, 0}, // 126 Mono Mode On
     {SYSTEM, 127, 0, 127, 0, 0}, // 127 Poly Mode On
 };
-RtMidiIn *midiIn = 0;
-RtMidiOut *SYX = 0;
-RtMidiOut *HWOUT = 0;
+RtMidiIn* midiIn = 0;
+RtMidiOut* SYX = 0;
+RtMidiOut* HWOUT = 0;
 
 int main(int argc, char *argv[]) {
   midiIn = new RtMidiIn();
@@ -508,106 +507,93 @@ int main(int argc, char *argv[]) {
   return 0;
 }
 
-void onMIDI(double deltatime, std::vector<unsigned char> *message,
-            void * /*userData*/) // handles incomind midi
-{
-  // cout << "MIDI MESSAGE" << endl;
-
+void onMIDI(double deltatime, std::vector<unsigned char> *message, void * userData) {
   unsigned char byte0 = (int)message->at(0);
   unsigned char typ = byte0 & 0xF0;
-  unsigned char ch = byte0 & 0x0F;
   uint size = message->size();
-  if (size == 1 || byte0 == 0xF0 || typ != 0xB0) // sysex or clock or non cc
+
+  if (size == 1 || byte0 == 0xF0 || typ != 0xB0)
   {
     sendMessage(message);
-  } else {
-    int mCC = (int)message->at(1);
-    CC_MAPPING C = MAP[mCC];
+    return;
+  }
 
-    //  cout << "MAP: " << C.TYPE << " Param: " << C.PARAMETER << endl;
-    if (C.TYPE == CC || C.TYPE == SYSTEM) {
-      // cout << "CC: " << mCC << endl;
-      message->at(1) = C.CC; // remap incoming CC to target CC as in MAP.
-      sendMessage(message);
+  int mCC = (int)message->at(1);
+  CC_MAPPING C = MAP[mCC];
+
+  // --- 1. Standard CC / SYSTEM Logic (Volume, Pan, etc.) ---
+  // --- 1. Standard CC / SYSTEM Logic ---
+  if (C.TYPE == CC || C.TYPE == SYSTEM) {
+    int rawIn = (int)message->at(2);
+
+    if (rawIn == lastSent[mCC]) {
       return;
     }
+    lastSent[mCC] = rawIn;
 
-    if (C.TYPE == SYSEX) {
+    message->at(1) = (unsigned char)C.CC;
+    sendMessage(message);
+    return;
+  }
 
-      // 1. Get raw 7-bit value (0-127)
-      int rawVal = (int)message->at(2);
+  // --- 2. SYSEX Logic (Algorithm & Operators) ---
+  if (C.TYPE == SYSEX) {
+    int rawIn = (int)message->at(2);
+    int tMin = C.MIN;
+    int tMax = C.MAX;
+    int tRange = tMax - tMin;
+    int finalVal = tMin;
 
-      // 2. Nearest-integer rounding using only fast integer math
-      // Formula: ((Value * Range) + 63) / 127
-      int targetRange = C.MAX - C.MIN;
-      int quantizedVal = ((rawVal * targetRange) + 63) / 127;
-
-      // 3. Final value shifted to the correct starting point
-      int value = C.MIN + quantizedVal;
-
-      if (C.CC == 119) { // we have algorithm update - currently unused as I'm
-                         // not sure what changes I need to make to make it work
-                         // for the new mapping
-        updateAlgos(value);
-      }
-
-      vector<unsigned char> oSYX = BASE_SYX;
-
-      oSYX.at(BPOS::GROUP) = C.GROUP;
-      oSYX.at(BPOS::PARAMETER) = C.PARAMETER;
-      oSYX.at(BPOS::DATA) = value;
-
-      // DEBUG OUTPUT
-      // cout << "CC: " << mCC << " GROUP: " << (int)C.GROUP << " (0x" << hex <<
-      // (int)C.GROUP << dec << ") PARAM: " << C.PARAMETER << " VAL: " << value
-      // << endl;
-
-      sendMessage(&oSYX);
+    // 1. HIGH-RESOLUTION QUANTIZATION
+    if (tRange > 0) {
+      finalVal = tMin + ((rawIn * tRange) + 63) / 127;
     }
 
-    // ... existing code ...
-    if (C.TYPE == MACRO) {
-      ENVS ENV;
-      switch (C.PARAMETER) {
-      case 0:
-        ENV = ATTACK;
-        break;
-      case 1:
-        ENV = DECAY;
-        break;
-      case 2:
-        ENV = SUSTAIN;
-        break;
-      case 3:
-        ENV = RELEASE;
-        break;
-      }
-      vector<int> params;
-      switch (C.GROUP) {
-      case 0:
-        params = ENV.CARRIERS;
-        break;
-      case 1:
-        params = ENV.MODULATORS;
-        break;
-      case 2:
-        params = ENV.LCARRIERS;
-        break;
-      case 3:
-        params = ENV.LMODULATORS;
-        break;
-      }
+    // 2. DE-DUPLICATION (The Gate Keeper)
+    // Only sends a message if the final integer value actually changes.
+    // This provides natural thinning without skipping any actual values.
+    if (finalVal == lastSent[mCC]) {
+      return;
+    }
+    lastSent[mCC] = finalVal;
 
-      for (size_t i = 0; i != params.size(); i++) {
-        //  cout << "Macro: item " << params.at(i) << endl;
-        vector<unsigned char> *mmessage = message;
-        mmessage->at(1) = (unsigned char)params.at(i);
-        onMIDI(deltatime, mmessage, 0);
-      }
+    // 3. HARDWARE CLAMP
+    if (finalVal > tMax) finalVal = tMax;
+    if (finalVal < tMin) finalVal = tMin;
+
+    // 4. STATIC BUFFER DISPATCH (Fastest for Akai CPU)
+    static std::vector<unsigned char> oSYX = BASE_SYX;
+    oSYX[BPOS::GROUP] = (unsigned char)C.GROUP;
+    oSYX[BPOS::PARAMETER] = (unsigned char)C.PARAMETER;
+    oSYX[BPOS::DATA] = (unsigned char)finalVal;
+
+    sendMessage(&oSYX);
+    return;
+  }
+
+  // 5. MACRO LOGIC (Triggered by C.TYPE == MACRO - e.g. Parked CC 120)
+  if (C.TYPE == MACRO) {
+    int rawIn = (int)message->at(2);
+    int finalVal = (rawIn * (C.MAX - C.MIN) + 63) / 127 + C.MIN;
+
+    updateAlgos(finalVal);
+
+    ENVS ENV;
+    switch (C.PARAMETER) {
+      case 0: ENV = ATTACK; break;
+      case 1: ENV = DECAY; break;
+      case 2: ENV = SUSTAIN; break;
+      case 3: ENV = RELEASE; break;
+    }
+    const std::vector<int>& params = (C.GROUP == 0) ? ENV.CARRIERS :
+                                     (C.GROUP == 1) ? ENV.MODULATORS :
+                                     (C.GROUP == 2) ? ENV.LCARRIERS : ENV.LMODULATORS;
+    for (size_t i = 0; i != params.size(); i++) {
+      message->at(1) = (unsigned char)params.at(i);
+      onMIDI(deltatime, message, nullptr);
     }
   }
 }
-
 int limit(int v, int min, int max) {
   if (v < min)
     v = min;

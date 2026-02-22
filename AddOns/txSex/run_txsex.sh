@@ -11,6 +11,5 @@ port="$(cat $mmPath/AddOns/txSex/TX-MIDI-PORT.txt)"
 if test "$1" == "kill"; then
     killall txsex 2>/dev/null
 else
-  $mmPath/AddOns/dxSex/txsex -p "$port"  2>/dev/null   &
+  $mmPath/AddOns/txSex/txsex -p "$port"  2>/dev/null   &
 fi
-
