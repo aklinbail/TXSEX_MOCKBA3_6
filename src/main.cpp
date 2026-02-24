@@ -548,8 +548,17 @@ void onMIDI(double deltatime, std::vector<unsigned char> *message, void * userDa
     return;
   }
 
+  // --- 2A-1 System SYSTEM Logic
+  // This allows pressing buttons with a slider, without flooding the zone
+  // but doesn't prevent multiple sends of the same button
+  if (c.TYPE == SYSTEM) {
+    if (b2 == 0 || b2 == 31) b2 = 0;
+    else if (b2 == 94 || b2 == 127) b2 = 127;
+    else return;
+  }
+
   // --- 2B. ORIGINAL SYSEX Logic (IDENTICAL TO YOUR STARTING CODE) ---
-  if (C.TYPE == SYSEX) {
+  if (C.TYPE == SYSEX ) {
     int rawIn = (int)message->at(2);
     int tMin = C.MIN;
     int tMax = C.MAX;
@@ -683,7 +692,7 @@ void sendMessage(vector<unsigned char> *message) {
     try {
       HWOUT->sendMessage(message);
     } catch (...) {
-      cout << "Error Sendind Midi to: " << oPORTNAME << endl;
+      cout << "Error Sending Midi to: " << oPORTNAME << endl;
     }
   }
 }
@@ -695,7 +704,7 @@ long long getSecs() // gets time since epch in seconds
 }
 void signalHandler(int signum) {
   cout << "Interrupt signal (" << signum << ") received.\n";
-  cout << "Process txsex Terminiated!" << endl;
+  cout << "Process txsex Terminated!" << endl;
   cleanup();
 }
 
